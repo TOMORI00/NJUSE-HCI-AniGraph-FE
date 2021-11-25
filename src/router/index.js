@@ -4,6 +4,7 @@ import SearchPage from "@/views/SearchPage";
 import HomePage from "@/views/HomePage";
 import ArchivePage from "@/views/ArchivePage";
 import GraphPage from "../views/GraphPage";
+import CandidatePage from "@/views/CandidatePage";
 
 Vue.use(VueRouter);
 
@@ -33,7 +34,11 @@ const routes = [
     {
         path: "/graph",
         component: GraphPage
-    }
+    },
+    {
+        path: "/candidate",
+        component: CandidatePage
+    },
 ];
 
 export default new VueRouter( {

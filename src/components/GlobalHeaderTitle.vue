@@ -8,6 +8,7 @@ export default {
   methods: {
     toSearchPage() {
       this.$router.push("/search");
+      location.reload();
     }
   }
 };
