@@ -1,14 +1,14 @@
 <template>
-  <div v-title data-title="AniGraph | 搜索" id="search-page-body">
+  <div id="search-page-body" v-title data-title="AniGraph | 搜索">
     <GlobalHeader :current-page="currentPage"></GlobalHeader>
     <div id="search-page-main">
       <div id="search-page-slogan">
-        <img id="search-page-icon" src="../assets/logo.png" alt="fail">
+        <img id="search-page-icon" alt="fail" src="../assets/logo.png">
         <div id="search-page-title">AniGraph</div>
       </div>
       <div id="search-page-input">
         <input id="search-page-input-line">
-        <button id="search-page-input-button"></button>
+        <button id="search-page-input-button" @click="test"></button>
       </div>
     </div>
   </div>
@@ -17,6 +17,7 @@
 
 <script>
 import GlobalHeader from "@/components/GlobalHeader";
+import { searchEntityByNameAPI } from "@/api";
 
 export default {
   name: "SearchPage",
@@ -24,6 +25,17 @@ export default {
     return {
       currentPage: "SearchPage",
     };
+  },
+  methods: {
+    test() {
+      searchEntityByNameAPI()
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    }
   },
   components: { GlobalHeader }
 };
