@@ -7,8 +7,13 @@
         <div id="search-page-title">AniGraph</div>
       </div>
       <div id="search-page-input">
-        <input id="search-page-input-line">
-        <button id="search-page-input-button" @click="test"></button>
+        <input id="search-page-input-line" v-model="searchPageInputContent">
+        <button id="search-page-input-button" @click="searchPageInputConfirm">
+          <img src="../assets/searchIcon.png" alt="error" style="width: 20px">
+        </button>
+      </div>
+      <div id="search-page-forecast" v-if="searchPageInputContent !== ''">
+        <div v-for="(item, i) in searchForecastContent" :key="i" class="search-page-forecast-content">{{ item.name }}</div>
       </div>
     </div>
   </div>
@@ -21,42 +26,46 @@ import { searchEntityByNameAPI } from "@/api";
 
 export default {
   name: "SearchPage",
+  components: { GlobalHeader },
   data() {
     return {
       currentPage: "SearchPage",
+      searchPageInputContent: "",
+      searchForecastContent: [],
     };
   },
   methods: {
-    test() {
-      searchEntityByNameAPI()
+    searchPageInputConfirm() {
+      this.$router.push("/graph");
+    },
+    handleSearchLineChange() {
+      searchEntityByNameAPI(this.searchPageInputContent)
           .then((res) => {
-            console.log(res);
+            this.searchForecastContent = res.data.content;
           })
           .catch((err) => {
             console.log(err);
           });
     }
   },
-  components: { GlobalHeader }
+  watch: {
+    searchPageInputContent() {
+      if(this.searchPageInputContent === "") {
+        this.searchForecastContent = [];
+      } else {
+        this.handleSearchLineChange();
+      }
+    }
+  },
 };
 </script>
 
 <style scoped>
-#search-page-body {
-  /*background-size: cover;*/
-  /*background: url("../assets/background.png");*/
-  /*background-repeat: no-repeat;*/
-  /*background-attachment: fixed;*/
-  /*background: url("../asssets/background.png") no-repeat fixed;*/
-}
-
 #search-page-main {
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 92vh;
   flex-direction: column;
-  padding-bottom: 100px;
+  margin-top: 20vh;
 }
 
 #search-page-icon {
@@ -75,7 +84,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 70px;
+  margin-bottom: 60px;
 }
 
 #search-page-input-button {
@@ -89,6 +98,10 @@ export default {
   width: 550px;
   height: 45px;
   border-radius: 10px 0 0 10px;
+  padding-left: 15px;
+  padding-top: 3px;
+  color: black;
+  font-size: 20px;
 }
 
 #search-page-input {
@@ -97,4 +110,42 @@ export default {
   justify-content: center;
 }
 
+#search-page-forecast {
+  border-style:solid;
+  border-width:1px;
+  max-height: 300px;
+  overflow: auto;
+  position: relative;
+  right: 35px;
+  border-radius: 0 0 10px 10px;
+  width: 550px;
+  background: ghostwhite;
+  font-size: 20px;
+}
+
+#search-page-forecast::-webkit-scrollbar {
+  width : 10px;
+  height: 1px;
+}
+#search-page-forecast::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  box-shadow   : inset 0 0 3px rgba(0, 0, 0, 0.2);
+  background   : #fb7299;
+}
+#search-page-forecast::-webkit-scrollbar-track {
+  box-shadow   : inset 0 0 2px rgba(0, 0, 0, 0.2);
+  background: white;
+  border-radius: 10px;
+}
+
+.search-page-forecast-content {
+  padding-left: 20px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
+.search-page-forecast-content:hover {
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
 </style>

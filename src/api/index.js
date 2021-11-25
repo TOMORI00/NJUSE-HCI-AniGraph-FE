@@ -1,9 +1,5 @@
-import {axios} from "@/util/axios";
+import { axios } from "@/util/axios";
 
 export function searchEntityByNameAPI(data) {
-    return axios({
-        url: "/entity/searchEntityByName",
-        method: "GET",
-        data,
-    });
+    return axios.get("/entity/searchEntityByName", { params: { name: data } });
 }
