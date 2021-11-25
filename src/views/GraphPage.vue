@@ -1,7 +1,7 @@
 <template>
   <div>
     <global-header/>
-    <div class="graph-wrapper" @contextmenu.prevent=""></div>
+    <div class="graph-wrapper"></div>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ import * as data from "./miserables.json";
 
 export default {
   name: "GraphPage",
-  components:{
+  components: {
     GlobalHeader,
   },
   data() {
@@ -20,110 +20,82 @@ export default {
       kgSvg: null,
     };
   },
+  computed: {},
   mounted() {
     const _this = this;
+    window.onresize = function () {
+      _this.watchWindowSize();
+    };
     _this.initPage();
 
   },
   methods: {
     initPage() {
       const _this = this;
-      _this.kgSvg = d3.select(".graph-wrapper")
-        .append("svg")
-        .attr("viewBox", [0, 0, 800, 600]);
+      let w = document.body.clientWidth;
+      let h = document.body.clientHeight - 64;
       _this.initGraph({
-        nodes:data.nodes,
-        links:data.links,
-      },{
-        nodeId: d=>d.id,
-        nodeGroup:d=>d.group,
+        nodes: data.nodes,
+        links: data.links,
+      }, {
+        nodeStrength: d => d.group * (-20),
         linkStrokeWidth: l => Math.sqrt(l.value),
+        linkStrength: 0.5,
+        width: w,
+        height: h,
       });
     },
 
     initGraph({nodes, links}, {
-      nodeId = d => d.id,
-      nodeGroup,
-      nodeGroups,
       nodeTitle,
-      // nodeFill = "currentColor",
+      nodeFill,
       nodeStroke = "#fff",
       nodeStrokeWidth = 1.5,
       nodeStrokeOpacity = 1,
-      nodeRadius = 5,
+      nodeRadius = 8,
       nodeStrength,
-      // linkSource = ({source}) => source,
-      // linkTarget = ({target}) => target,
       linkStroke = "#999",
       linkStrokeOpacity = 0.6,
       linkStrokeWidth = 1.5,
       linkStrokeLinecap = "round",
       linkStrength,
-      colors = d3.schemeTableau10,
-      width = 800,
-      height = 600,
+      width,
+      height,
       invalidation
     } = {}) {
-      const _this = this;
-      const NODE = d3.map(nodes, nodeId).map(intern);
-      // const LINK_SOURCE = d3.map(links, linkSource).map(intern);
-      // const LINK_TARGET = d3.map(links, linkTarget).map(intern);
-      // if (nodeTitle === undefined) {
-      //   nodeTitle = function (d) {
-      //     return d.id;
-      //   };
-      // }
-      // const NODE_TITLE = nodeTitle === null ? null : d3.map(nodes, nodeTitle);
-      const NODE_GROUP = nodeGroup === null ? null : d3.map(nodes, nodeGroup).map(intern);
-      console.log("NODE_GROUP", NODE_GROUP);
-      const LINK_STROKE_WIDTH = typeof linkStrokeWidth !== "function" ? null : d3.map(links, linkStrokeWidth);
-
-      // nodes = d3.map(nodes, function (d, index) {
-      //   return {
-      //     id: NODE[index],
-      //   };
-      // });
-      console.log("nodes", nodes);
-      // links = d3.map(links, function (d, index) {
-      //   return {
-      //     source: LINK_SOURCE[index],
-      //     target: LINK_TARGET[index],
-      //   };
-      // });
-      console.log(links);
-
-      console.log("nodeGroups", nodeGroups);
-      if (NODE_GROUP && nodeGroups === undefined) {
-        nodeGroups = d3.sort(NODE_GROUP);
+      if (height === undefined || width === undefined) {
+        return;
       }
-      console.log("nodeGroups", nodeGroups);
 
-      const color = nodeGroup == null ? null : d3.scaleOrdinal(nodeGroups, colors);
-      console.log("color", color);
+      let svg = d3.select(".graph-wrapper")
+        .append("svg")
+        .attr("id", "kgSvg")
+        .attr("viewBox", [0, 0, width, height]);
 
       const forceNode = d3.forceManyBody();
-      const forceLink = d3.forceLink(links).id(({index: i}) => NODE[i]);
+      const forceLink = d3.forceLink(links).id(d => d.id);
       if (nodeStrength !== undefined) {
         forceNode.strength(nodeStrength);
       }
       if (linkStrength !== undefined) {
-        forceLink.strength(linkStrength);
+        forceLink.strength(0.1);
       }
-
       const simulation = d3.forceSimulation(nodes)
         .force("link", forceLink)
         .force("charge", forceNode)
         .force("center", d3.forceCenter(width / 2, height / 2))
         .on("tick", ticked);
 
-      let g = _this.kgSvg.append("g");
+      let g = svg.append("g");
 
       let link = g.append("g")
         .selectAll(".link")
         .data(links)
         .join("path")
         .attr("stroke", linkStroke)
-        .attr("stroke-width", typeof linkStrokeWidth !== "function" ? linkStrokeWidth : null)
+        .attr("stroke-width", function (d) {
+          return typeof linkStrokeWidth !== "function" ? linkStrokeWidth : linkStrokeWidth(d);
+        })
         .attr("stroke-opacity", linkStrokeOpacity)
         .attr("stroke-linecap", linkStrokeLinecap)
         .attr("class", "link");
@@ -136,38 +108,29 @@ export default {
         .attr("stroke", nodeStroke)
         .attr("stroke-width", nodeStrokeWidth)
         .attr("stroke-opacity", nodeStrokeOpacity)
-        .attr("fill","#e15759")
+        .attr("fill", function (d) {
+          return nodeFill === undefined ? "#e15759" : nodeFill(d);
+        })
         .attr("class", "node")
         .call(drag(simulation));
-
-      if(LINK_STROKE_WIDTH){
-        link.attr("stroke-width", function ({index:i}){
-          return LINK_STROKE_WIDTH[i];
-        });
-      }
-      // if(NODE_GROUP){
-      //   node.attr("fill", function ({index:i}){
-      //     return color(NODE_GROUP[i]);
-      //   });
-      // }
-      // if(NODE_TITLE){
-      //   node.append("title")
-      //     .text(function ({index:i}){
-      //       return NODE_TITLE[i];
-      //     });
-      // }
-
       // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
-      if(nodeTitle !== undefined){
+      if (nodeTitle !== undefined) {
         node.append("title")
-        .text(function (d){
-          return nodeTitle(d);
-        });
+          .text(function (d) {
+            return nodeTitle(d);
+          });
       }
+
+      svg.call(d3.zoom()
+        .extent([[0, 0], [width, height]])
+        // .scaleExtent([0.5, 4])
+        .on("zoom", zoom));
+
+
       if (invalidation != null) invalidation.then(() => simulation.stop());
 
-      function intern(value) {
-        return value != null && typeof value === "object" ? value.valueOf() : value;
+      function zoom(event) {
+        g.attr("transform", event.transform);
       }
 
       function ticked() {
@@ -209,13 +172,19 @@ export default {
           .on("end", dragended);
       }
     },
+
+    watchWindowSize() {
+      let w = document.documentElement.clientWidth;
+      let h = document.documentElement.clientHeight - 64;
+      d3.select("#kgSvg").attr("viewBox", [0, 0, Math.max(w, 700), h]);
+    },
   },
 };
 </script>
 
 <style scoped>
 .graph-wrapper {
-  width: 100%;
+  /*width: 100%;*/
   /*height: 600px;*/
 }
 </style>
