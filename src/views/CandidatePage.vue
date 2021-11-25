@@ -15,11 +15,11 @@ export default {
     return {
       currentPage: "CandidatePage",
       searchPageInputContent: "",
-      searchForecastContent: [],
     };
   },
   mounted() {
-
+    this.searchPageInputContent = this.$route.query.q;
+    console.log(this.$route.query.q);
   }
 };
 </script>
