@@ -4,8 +4,7 @@
     <div id="candidate-page-main">
       <div v-for="(item, i) in searchCandidateContent" id="candidate-page-list" :key="i"
            class="candidate-page-list-content">
-        <!--        {{item}}-->
-        <div class="candidate-page-list-content-img">
+        <div class="candidate-page-list-content-img" @click="toGraph(item.id)">
           {{ item.image_grid }}
         </div>
         <div class="candidate-page-list-content-description">
@@ -40,7 +39,13 @@ export default {
         .then((res) => {
           this.searchCandidateContent = res.data.content;
         });
-  }
+  },
+  methods: {
+    toGraph(id) {
+      console.log(id);
+      this.$router.push({ path: "/graph", query: { id: id } });
+    }
+  },
 };
 </script>
 
@@ -72,9 +77,12 @@ export default {
   width: 80px;
   height: 120px;
   margin-right: 10px;
-
   background: #fb7299;
   overflow: hidden;
+}
+
+.candidate-page-list-content-img:hover {
+  cursor: pointer;
 }
 
 .candidate-page-list-content-title {
@@ -86,5 +94,10 @@ export default {
   color: #fb7299;
   font-weight: bold;
   margin-right: 10px;
+}
+
+.candidate-page-list-content-title-name-cn:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 </style>
