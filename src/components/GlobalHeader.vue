@@ -28,8 +28,8 @@ export default {
   height: 8vh;
   min-height: 32px;
   max-height: 64px;
-  backdrop-filter: saturate(180%) blur(10px);
+  backdrop-filter: saturate(200%) blur(30px);
   background: rgba(250,250,250,0.72);
-  box-shadow: 10px 5px 50px rgba(230,230,230,0.72);
+  box-shadow: 10px 10px 50px rgba(220,220,220,0.72);
 }
 </style>
