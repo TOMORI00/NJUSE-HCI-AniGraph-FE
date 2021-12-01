@@ -17,7 +17,8 @@ export default {
   },
   computed: {},
   async mounted() {
-    // let entityId = this.$route.query.entityID;
+    // let entityId = this.$route.query.entityId;
+    console.log(this.$route.query.entityId);
     let entityId = 261103;
     let res = await getRelationsByEntityIdAPI(entityId);
     this.nodes = res.data.content.Entities;

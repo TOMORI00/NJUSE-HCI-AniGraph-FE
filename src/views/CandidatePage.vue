@@ -9,12 +9,13 @@
         </div>
         <div class="candidate-page-list-content-description">
           <div class="candidate-page-list-content-title">
-            <div class="candidate-page-list-content-title-name-cn">{{ item.name_cn }}</div>
+            <div class="candidate-page-list-content-title-name-cn" @click="toGraph(item.id)">{{ item.name_cn }}</div>
             <div class="candidate-page-list-content-title-name">{{ item.name }}</div>
           </div>
           <div class="candidate-page-list-content-">
             {{ item.summary }}
           </div>
+          *调试信息：ID={{item.id}}
         </div>
       </div>
     </div>
@@ -42,8 +43,7 @@ export default {
   },
   methods: {
     toGraph(id) {
-      console.log(id);
-      this.$router.push({ path: "/graph", query: { id: id } });
+      this.$router.push({ path: "/graph", query: { entityId: id } });
     }
   },
 };
