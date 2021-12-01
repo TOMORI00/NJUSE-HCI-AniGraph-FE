@@ -7,7 +7,7 @@
         <div id="search-page-title">AniGraph</div>
       </div>
       <div id="search-page-input">
-        <input id="search-page-input-line" v-model="searchPageInputContent" :placeholder="searchPagePlaceHolder">
+        <input id="search-page-input-line" v-model="searchPageInputContent" :placeholder="searchPagePlaceHolder" autofocus>
         <button id="search-page-input-button" @click="searchPageInputConfirm">
           <img alt="error" src="../assets/searchIcon.png" style="width: 20px">
         </button>
@@ -52,6 +52,7 @@ export default {
         if (elem) {
           elem.classList.add("shake");
           this.searchPagePlaceHolder = "请输入点什么";
+          elem.focus();
           setTimeout(() => {
             elem.classList.remove("shake");
           }, 800);
@@ -219,7 +220,7 @@ export default {
   animation: shake 800ms ease-in-out;
 }
 
-@keyframes shake { /* 垂直抖动，核心代码 */
+@keyframes shake {
   10%, 90% {
     transform: translate3d(0, -1px, 0);
   }

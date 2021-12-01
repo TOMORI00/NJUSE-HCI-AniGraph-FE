@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-input></a-input>
+<!--    <a-input></a-input>-->
   </div>
 </template>
 
