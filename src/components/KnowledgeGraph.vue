@@ -17,10 +17,11 @@ export default {
   },
   computed: {},
   async mounted() {
-    // let entityId = this.$route.query.entityId;
-    console.log(this.$route.query.entityId);
-    let entityId = 261103;
+    let entityId = this.$route.query.entityId;
+    // console.log(this.$route.query.entityId);
+    // let entityId = 261103;
     let res = await getRelationsByEntityIdAPI(entityId);
+    console.log(res);
     this.nodes = res.data.content.Entities;
     this.links = res.data.content.Relations;
     const _this = this;
