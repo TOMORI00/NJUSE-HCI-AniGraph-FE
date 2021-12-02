@@ -14,7 +14,7 @@
             *调试信息：ID={{ item.id }}
           </div>
           <div class="candidate-page-list-content-summary">
-            {{ decodeURIComponent(item.summary) }}
+            {{ decodeURIComponent(String(item.summary).replace(/%/g, "%25")) }}
           </div>
         </div>
       </div>
@@ -43,14 +43,6 @@ export default {
     searchEntityByNameAPI(decodeURIComponent(String(this.$route.query.q)))
       .then((res) => {
         this.searchCandidateContent = res.data.content;
-        for (let i = 0; i < this.searchCandidateContent.length; i++) {
-          try {
-            this.searchCandidateContent[i].image.replace("http", "https");
-          } catch (e) {
-            console.log(this.searchCandidateContent[i]);
-            break;
-          }
-        }
       });
   },
   methods: {
