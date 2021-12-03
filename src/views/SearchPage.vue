@@ -36,12 +36,18 @@ export default {
       searchForecastContent: [],
     };
   },
-  created() {
+  mounted() {
     const that = this;
     document.onkeydown = function () {
       const key = window.event.keyCode;
-      if (key === 13) {
-        that.searchPageInputConfirm();
+      switch (key) {
+        case 13:
+          that.searchPageInputConfirm();
+          break;
+        case 40:
+
+          console.log(document.getElementById("search-page-forecast").children);
+
       }
     };
   },
