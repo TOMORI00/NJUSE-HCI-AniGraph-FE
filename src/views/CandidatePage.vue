@@ -5,13 +5,13 @@
       <div v-for="(item, i) in searchCandidateContent" id="candidate-page-list" :key="i"
            class="candidate-page-list-content">
         <img class="candidate-page-list-content-img" @click="toGraph(item.id)"
-             :src="getImageSrc(item.image)">
+             :src="getImageSrc(item.image_grid)">
         <div class="candidate-page-list-content-description">
           <div class="candidate-page-list-content-title">
             <div class="candidate-page-list-content-title-name-cn" @click="toGraph(item.id)">{{ item.name_cn }}</div>
             <div class="candidate-page-list-content-title-name">{{ item.name }}</div>
-            <div style="width: 100px"></div>
-            *调试信息：ID={{ item.id }}
+<!--            <div style="width: 100px"></div>-->
+<!--            *调试信息：ID={{ item.id }}-->
           </div>
           <div class="candidate-page-list-content-summary">
             {{ decodeURIComponent(String(item.summary).replace(/%/g, "%25")) }}
@@ -82,7 +82,7 @@ export default {
 }
 
 .candidate-page-list-content-img {
-  width: 80px;
+  width: 120px;
   height: 120px;
   margin-right: 10px;
 }

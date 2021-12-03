@@ -7,7 +7,7 @@
         <div id="search-page-title">AniGraph</div>
       </div>
       <div id="search-page-input">
-        <input id="search-page-input-line" v-model="searchPageInputContent" :placeholder="searchPagePlaceHolder" autofocus>
+        <input id="search-page-input-line" v-model="searchPageInputContent" :placeholder="searchPagePlaceHolder" autofocus autocomplete="off">
         <button id="search-page-input-button" @click="searchPageInputConfirm">
           <img alt="error" src="../assets/searchIcon.png" style="width: 20px">
         </button>

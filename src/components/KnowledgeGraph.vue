@@ -37,8 +37,11 @@ export default {
         links: _this.links,
       }, {
         nodeFill: _this.getNodeFill,
-        nodeTitle: d=>d.id,
-        nodeStrength: -200,
+        nodeTitle: d => d.id,
+        nodeStrength: function (d) {
+          return d.name_cn.length * -50;
+        },
+        // nodeStrength: -100,
         linkStrength: 0.1,
         width: w,
         height: h,
@@ -51,11 +54,12 @@ export default {
     initGraph({nodes, links}, {
       nodeTitle,
       nodeFill,
-      nodeStroke = "rgb(0,0,0)",
+      nodeStroke = "rgb(255,255,255)",
       nodeStrokeWidth = 1.5,
       nodeStrokeOpacity = 1,
       nodeRadius = 12,
       nodeStrength,
+      nodeCollision,
       linkStroke = "#999",
       linkStrokeOpacity = 0.6,
       linkStrokeWidth = 2,
@@ -78,17 +82,26 @@ export default {
         .attr("viewBox", [0, 0, width, height]);
 
       const forceNode = d3.forceManyBody();
-      const forceLink = d3.forceLink(links).id(d => d.id);
       if (nodeStrength !== undefined) {
-        forceNode.strength(nodeStrength);
-
+        if(typeof nodeStrength === "number") {
+          forceNode.strength(nodeStrength);
+        }
+        if(typeof nodeStrength === "function"){
+          forceNode.strength(nodeStrength);
+        }
       }
+      const forceLink = d3.forceLink(links).id(d => d.id);
       if (linkStrength !== undefined) {
         forceLink.strength(linkStrength);
+      }
+      const forceCollision = d3.forceCollide();
+      if (nodeCollision !== undefined){
+        forceCollision.radius(100);
       }
       const simulation = d3.forceSimulation(nodes)
         .force("link", forceLink)
         .force("charge", forceNode)
+        .force("collision", forceCollision)
         .force("center", d3.forceCenter(width / 2, height / 2))
         .on("tick", ticked);
 
@@ -278,13 +291,15 @@ export default {
       let type = String(id)[0];
       switch (type) {
         case "1":
-          return "rgb(250, 114, 125)";
+          // return "rgb(250, 114, 125)";
+          return "#ff7875";
         case "2":
           return "rgb(45, 183, 245)";
         case "3":
           return "rgb(112, 212, 69)";
         case "4":
-          return "rgb(255, 138, 12)";
+          // return "rgb(255, 138, 12)";
+          return "#ffa940";
       }
     },
   },
