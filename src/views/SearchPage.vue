@@ -74,10 +74,10 @@ export default {
     handleArrowKey(direction) {
       const elem = document.getElementById("search-page-forecast");
       const elems = document.getElementsByClassName("search-page-forecast-content");
+      const inputLine = document.getElementById("search-page-input-line");
       if (direction === "down") {
         if (this.currentIndex < elems.length - 1) {
           this.currentIndex++;
-          this.searchPageInputContent = elems[this.currentIndex].textContent.trim();
         } else {
           this.currentIndex = 0;
         }
@@ -85,12 +85,11 @@ export default {
       if (direction === "up") {
         if (this.currentIndex > 0) {
           this.currentIndex--;
-          this.searchPageInputContent = elems[this.currentIndex].textContent.trim();
         } else {
           this.currentIndex = elems.length;
         }
       }
-      const inputLine = document.getElementById("search-page-input-line");
+      this.searchPageInputContent = elems[this.currentIndex].textContent.trim();
       inputLine.focus();
       setTimeout(() => {
         inputLine.selectionStart = elems[this.currentIndex].textContent.length;
