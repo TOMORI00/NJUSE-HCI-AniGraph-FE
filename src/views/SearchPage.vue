@@ -7,15 +7,29 @@
         <div id="search-page-title">AniGraph</div>
       </div>
       <div id="search-page-input">
-        <input id="search-page-input-line" v-model="searchPageInputContent" :placeholder="searchPagePlaceHolder" autofocus autocomplete="off">
+        <input
+            id="search-page-input-line"
+            v-model="searchPageInputContent"
+            :placeholder="searchPagePlaceHolder"
+            autocomplete="off"
+            autofocus
+            @click="currentIndex = -1">
         <button id="search-page-input-button" @click="searchPageInputConfirm">
           <img alt="error" src="../assets/searchIcon.png" style="width: 20px">
         </button>
       </div>
       <div v-if="searchPageInputContent !== ''" id="search-page-forecast">
-        <div v-for="(item, i) in searchForecastContent" :key="i" class="search-page-forecast-content"
-             @click="handleForecastConfirm(item)">{{ item }}
+        <div
+            v-for="(item, i) in searchForecastContent"
+            :key="i"
+            :class="{active: currentIndex === i}"
+            class="search-page-forecast-content"
+            @click="handleForecastConfirm(item)"
+            @mouseover="currentIndex = i">{{ item }}
         </div>
+      </div>
+      <div v-if="searchPageInputContent !== '' && searchForecastContent.length === 0"
+           id="search-page-forecast-none-match">暂无匹配
       </div>
     </div>
   </div>
@@ -23,7 +37,7 @@
 
 <script>
 import GlobalHeader from "@/components/GlobalHeader";
-import { getSearchEntityCandidateAPI } from "@/api";
+import { searchEntityCandidateAPI } from "@/api";
 
 export default {
   name: "SearchPage",
@@ -34,24 +48,57 @@ export default {
       searchPagePlaceHolder: "开始探索番剧/人物/公司",
       searchPageInputContent: "",
       searchForecastContent: [],
+      currentIndex: -1,
     };
   },
   mounted() {
     const that = this;
     document.onkeydown = function () {
-      const key = window.event.keyCode;
-      switch (key) {
-        case 13:
-          that.searchPageInputConfirm();
-          break;
-        case 40:
-
-          console.log(document.getElementById("search-page-forecast").children);
-
+      if (that.$router.currentRoute.path === "/search") {
+        const key = window.event.keyCode;
+        switch (key) {
+          case 13:
+            that.searchPageInputConfirm();
+            break;
+          case 40:
+            that.handleArrowKey("down");
+            break;
+          case 38:
+            that.handleArrowKey("up");
+            break;
+        }
       }
     };
   },
   methods: {
+    handleArrowKey(direction) {
+      const elem = document.getElementById("search-page-forecast");
+      const elems = document.getElementsByClassName("search-page-forecast-content");
+      if (direction === "down") {
+        if (this.currentIndex < elems.length - 1) {
+          this.currentIndex++;
+          this.searchPageInputContent = elems[this.currentIndex].textContent.trim();
+        } else {
+          this.currentIndex = 0;
+        }
+      }
+      if (direction === "up") {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+          this.searchPageInputContent = elems[this.currentIndex].textContent.trim();
+        } else {
+          this.currentIndex = elems.length;
+        }
+      }
+      const inputLine = document.getElementById("search-page-input-line");
+      inputLine.focus();
+      setTimeout(() => {
+        inputLine.selectionStart = elems[this.currentIndex].textContent.length;
+        inputLine.selectionEnd = elems[this.currentIndex].textContent.length;
+      }, 10);
+      elem.scrollTo({ top: this.currentIndex * 32 - 256 });
+      this.$forceUpdate();
+    },
     searchPageInputConfirm() {
       if (this.searchPageInputContent === "") {
         let elem = document.getElementById("search-page-input");
@@ -90,13 +137,15 @@ export default {
       }
     },
     handleSearchLineChange() {
-      getSearchEntityCandidateAPI(this.searchPageInputContent)
-          .then((res) => {
-            this.searchForecastContent = res.data.content;
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+      if (this.currentIndex === -1 || !this.searchForecastContent.includes(this.searchPageInputContent)) {
+        searchEntityCandidateAPI(this.searchPageInputContent.trim())
+            .then((res) => {
+              this.searchForecastContent = res.data.content;
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+      }
     },
     handleForecastConfirm(val) {
       this.searchPageInputContent = val;
@@ -109,6 +158,7 @@ export default {
       if (this.searchPageInputContent === "") {
         elem.style.borderRadius = "10px 0 0 10px";
         this.searchForecastContent = [];
+        this.currentIndex = -1;
       } else {
         elem.style.borderRadius = "10px 0 0 0";
         this.handleSearchLineChange();
@@ -189,9 +239,10 @@ export default {
   overflow: auto;
   position: relative;
   right: 35px;
-  border-radius: 0 0 10px 10px;
-  width: 550px;
+  border-radius: 0 0 5px 10px;
+  width: 549px;
   font-size: 20px;
+  scroll-behavior: smooth;
 }
 
 #search-page-forecast::-webkit-scrollbar {
@@ -200,14 +251,13 @@ export default {
 }
 
 #search-page-forecast::-webkit-scrollbar-thumb {
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.2);
   background: #fb7299;
 }
 
 #search-page-forecast::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
-  background: white;
+  background: rgba(255, 255, 255, 1);
   border-radius: 10px;
 }
 
@@ -217,8 +267,23 @@ export default {
   padding-bottom: 1px;
 }
 
-.search-page-forecast-content:hover {
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.4);
+#search-page-forecast-none-match {
+  border-radius: 0 0 5px 10px;
+  border: 1px solid #fb7299;
+  border-top: white;
+  font-size: 20px;
+  width: 549px;
+  position: relative;
+  right: 35px;
+  padding-left: 15px;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+
+.active {
+  box-shadow: inset 0 0 3px rgba(250, 250, 250, 0.4);
+  background: rgba(251, 114, 153);
+  color: white;
   cursor: pointer;
 }
 

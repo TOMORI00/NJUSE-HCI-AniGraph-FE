@@ -5,15 +5,17 @@
       <div v-for="(item, i) in searchCandidateContent" id="candidate-page-list" :key="i"
            class="candidate-page-list-content">
         <img class="candidate-page-list-content-img" @click="toGraph(item.id)"
-             :src="getImageSrc(item.image_grid)">
+             :src="getImageSrc(item.image_grid)" alt="Error..." >
         <div class="candidate-page-list-content-description">
           <div class="candidate-page-list-content-title">
-            <div class="candidate-page-list-content-title-name-cn" @click="toGraph(item.id)">{{ item.name_cn }}</div>
+            <div
+                class="candidate-page-list-content-title-name-cn"
+                @click="toGraph(item.id)">{{ item.name_cn }}</div>
             <div class="candidate-page-list-content-title-name">{{ item.name }}</div>
-<!--            <div style="width: 100px"></div>-->
-<!--            *调试信息：ID={{ item.id }}-->
           </div>
-          <div class="candidate-page-list-content-summary">
+          <div
+              class="candidate-page-list-content-summary"
+              style="white-space: pre-line; font-size: small">
             {{ decodeURIComponent(String(item.summary).replace(/%/g, "%25")) }}
           </div>
         </div>
@@ -34,7 +36,7 @@ export default {
       currentPage: "CandidatePage",
       searchCandidateContent: [],
 
-      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg",
+      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg", //todo 上服务器
     };
   },
   computed: {
@@ -93,13 +95,20 @@ export default {
 
 .candidate-page-list-content-title {
   display: flex;
-  font-size: large;
+  align-content: center;
 }
 
 .candidate-page-list-content-title-name-cn {
+  font-size: large;
   color: #fb7299;
   font-weight: bold;
   margin-right: 10px;
+  flex-shrink: 0.3;
+}
+
+.candidate-page-list-content-title-name {
+  padding-top: 3px;
+  color: rgba(128, 128, 128);
 }
 
 .candidate-page-list-content-title-name-cn:hover {
@@ -108,9 +117,10 @@ export default {
 }
 
 .candidate-page-list-content-summary {
+  margin-top: 5px;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   overflow: hidden;
 }
 </style>

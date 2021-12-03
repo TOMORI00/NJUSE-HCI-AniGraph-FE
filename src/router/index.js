@@ -5,6 +5,7 @@ import HomePage from "@/views/HomePage";
 import ArchivePage from "@/views/ArchivePage";
 import GraphPage from "../views/GraphPage";
 import CandidatePage from "@/views/CandidatePage";
+import Test from "@/views/Test";
 
 Vue.use(VueRouter);
 
@@ -38,6 +39,10 @@ const routes = [
     {
         path: "/candidate",
         component: CandidatePage
+    },
+    {
+        path: "/test",
+        component: Test
     },
 ];
 
