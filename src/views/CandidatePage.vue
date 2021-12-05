@@ -1,14 +1,20 @@
 <template>
-  <div id="search-page-body" v-title data-title="AniGraph | 搜索候选">
+  <div id="candidate-page-body" v-title data-title="AniGraph | 搜索候选">
     <GlobalHeader id="candidate-page-header" :current-page="currentPage"></GlobalHeader>
+    <div v-if="loadingCandidateContent" id="candidate-page-main-none-match">
+      <a-spin size="large" style="color: #fb7299"></a-spin>
+    </div>
+    <div v-if="noneCandidateContent" id="candidate-page-main-no-result">
+      <CandidateNotFoundTip></CandidateNotFoundTip>
+    </div>
     <div id="candidate-page-main">
-      <div v-for="(item, i) in searchCandidateContent"
+      <div v-for="(item, i) in candidateContent"
            id="candidate-page-list"
            :key="i"
            class="candidate-page-list-content">
         <img :src="item.image"
-             class="candidate-page-list-content-background"
-             alt="">
+             alt=""
+             class="candidate-page-list-content-background">
         <div style="text-align: center; width: 120px; height: 120px;">
           <img :src="getImageSrc(item.image)"
                alt="图片加载失败"
@@ -22,8 +28,7 @@
             </div>
             <div class="candidate-page-list-content-title-name">{{ item.name }}</div>
           </div>
-          <div class="candidate-page-list-content-summary"
-               style="white-space: pre-line; font-size: small">
+          <div class="candidate-page-list-content-summary">
             {{ decodeURIComponent(String(item.summary).replace(/%/g, "%25")) }}
           </div>
         </div>
@@ -35,23 +40,31 @@
 <script>
 import GlobalHeader from "@/components/GlobalHeader";
 import { searchEntityByNameAPI } from "@/api";
+import CandidateNotFoundTip from "@/components/CandidateNotFoundTip";
 
 export default {
   name: "CandidatePage",
-  components: { GlobalHeader },
+  components: { CandidateNotFoundTip, GlobalHeader },
   data() {
     return {
       currentPage: "CandidatePage",
-      searchCandidateContent: [],
+      candidateContent: [],
+      loadingCandidateContent: false,
+      noneCandidateContent: false,
 
       nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg", //todo 上服务器
     };
   },
   computed: {},
   mounted() {
+    this.loading = true;
     searchEntityByNameAPI(decodeURIComponent(String(this.$route.query.q)))
         .then((res) => {
-          this.searchCandidateContent = res.data.content;
+          this.candidateContent = res.data.content;
+          this.loading = false;
+          if (this.candidateContent.length === 0) {
+            this.noneCandidateContent = true;
+          }
         });
   },
   methods: {
@@ -82,6 +95,7 @@ export default {
 
 .candidate-page-list-content {
   width: 50vw;
+  min-width: 500px;
   margin-bottom: 35px;
   display: flex;
   padding: 5px;
@@ -153,11 +167,31 @@ export default {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+  white-space: pre-line;
+  font-size: small
 }
 
 .candidate-page-list-content-summary:before {
   content: "简介:";
   color: black;
   display: inline-block;
+}
+
+#candidate-page-main-none-match {
+  margin-top: 40vh;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+}
+
+/deep/ .ant-spin-dot-item {
+  background-color: #fb7299;
+}
+
+#candidate-page-main-no-result {
+  margin-top: 30vh;
+  display: flex;
+  align-content: center;
+  justify-content: center;
 }
 </style>
