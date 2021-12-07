@@ -5,7 +5,7 @@ import HomePage from "@/views/HomePage";
 import ArchivePage from "@/views/ArchivePage";
 import GraphPage from "../views/GraphPage";
 import CandidatePage from "@/views/CandidatePage";
-import Test from "@/views/Test";
+import ErrorPage from "@/views/ErrorPage";
 
 Vue.use(VueRouter);
 
@@ -41,8 +41,8 @@ const routes = [
         component: CandidatePage
     },
     {
-        path: "/test",
-        component: Test
+        path: "/error",
+        component: ErrorPage
     },
 ];
 

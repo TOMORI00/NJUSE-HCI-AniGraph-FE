@@ -38,13 +38,14 @@
 </template>
 
 <script>
+import {Spin as ASpin}from "ant-design-vue";
 import GlobalHeader from "@/components/GlobalHeader";
-import { searchEntityByNameAPI } from "@/api";
 import CandidateNotFoundTip from "@/components/CandidateNotFoundTip";
+import { searchEntityByNameAPI } from "@/api";
 
 export default {
   name: "CandidatePage",
-  components: { CandidateNotFoundTip, GlobalHeader },
+  components: { CandidateNotFoundTip, GlobalHeader, ASpin },
   data() {
     return {
       currentPage: "CandidatePage",
@@ -57,11 +58,11 @@ export default {
   },
   computed: {},
   mounted() {
-    this.loading = true;
+    this.loadingCandidateContent = true;
     searchEntityByNameAPI(decodeURIComponent(String(this.$route.query.q)))
         .then((res) => {
           this.candidateContent = res.data.content;
-          this.loading = false;
+          this.loadingCandidateContent = false;
           if (this.candidateContent.length === 0) {
             this.noneCandidateContent = true;
           }
@@ -101,7 +102,7 @@ export default {
   padding: 5px;
   border-radius: 5px;
   position: relative;
-  box-shadow: 0 3px 5px 0 rgba(150, 150, 150, 1);
+  box-shadow: 0 4px 5px 0 rgba(150, 150, 150, 1);
   z-index: 2;
   overflow: hidden;
 }

@@ -53,6 +53,7 @@ export default {
   },
   mounted() {
     const that = this;
+    document.getElementById("search-page-input-line").focus();
     document.onkeydown = function () {
       if (that.$router.currentRoute.path === "/search") {
         const key = window.event.keyCode;
@@ -109,6 +110,7 @@ export default {
             elem.classList.remove("shake");
           }, 800);
         }
+        document.getElementById("search-page-input-line").focus();
         return;
       }
       const elem1 = document.getElementById("search-page-main");
