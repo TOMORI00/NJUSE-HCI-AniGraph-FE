@@ -4,7 +4,7 @@
 
 <script>
 import * as d3 from "d3";
-import {getRelationsByEntityIdAPI} from "../api/relationApi";
+import {getRelationsByEntityIdAPI} from "../api/relations";
 
 export default {
   name: "KnowledgeGraph",

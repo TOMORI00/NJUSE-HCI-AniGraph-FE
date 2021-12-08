@@ -9,7 +9,7 @@ module.exports = {
             // 进度条
             new WebpackBar(),
             // 资源大小评估
-            new BundleAnalyzerPlugin(),
+            // new BundleAnalyzerPlugin(),
         ],
     })
 }
