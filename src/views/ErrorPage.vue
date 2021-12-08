@@ -54,22 +54,7 @@ export default {
 #error-page-tip-img {
   height: 50px;
   width: 50px;
-  /*animation: rotate 3s infinite;*/
 }
-
-/*@keyframes rotate {*/
-/*  0% {*/
-/*    transform: rotate(0);*/
-/*  }*/
-
-/*  50% {*/
-/*    transform: rotate(90deg);*/
-/*  }*/
-
-/*  100% {*/
-/*    transform: rotate(0deg);*/
-/*  }*/
-/*}*/
 
 #error-page-tip-1 {
   font-size: 35px;

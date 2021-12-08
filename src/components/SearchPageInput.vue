@@ -6,7 +6,6 @@
           v-model="inputContent"
           :placeholder="placeHolder"
           autocomplete="off"
-          autofocus
           @click="currentIndex = -1">
       <button id="search-input-main-button" @click="searchInputConfirm">
         <img alt="error" src="../assets/searchIcon.png" style="width: 20px">
@@ -32,7 +31,7 @@
 import { searchEntityCandidateAPI } from "@/api";
 
 export default {
-  name: "SearchInput",
+  name: "SearchPageInput",
   data() {
     return {
       placeHolder: "开始探索番剧/人物/公司",
@@ -45,7 +44,7 @@ export default {
     const that = this;
     document.getElementById("search-input-main-line").focus();
     document.onkeydown = function () {
-      if (that.$router.currentRoute.path === "/search" || that.$router.currentRoute.path === "/candidate") {
+      if (that.$router.currentRoute.path === "/search") {
         const key = window.event.keyCode;
         switch (key) {
           case 13:
@@ -104,26 +103,22 @@ export default {
         return;
       }
       const elem1 = document.getElementById("search-page-main");
-      const elem2 = document.getElementById("search-page-slogan");
       let tick = 0;
       let pos = 20;
       let opacity = 1.0;
-      let margin = 60;
       let id = setInterval(frame, 0);
       const that = this;
 
       function frame() {
-        if (tick === 75) {
+        if (tick === 80) {
           clearInterval(id);
           that.$router.push({ path: "/candidate", query: { q: that.inputContent } });
         } else {
           tick++;
           pos -= 0.25;
           opacity -= 0.02;
-          margin -= 1;
           elem1.style.marginTop = pos + "vh";
           elem1.style.opacity = opacity;
-          elem2.style.marginBottom = margin + "px";
         }
       }
     },

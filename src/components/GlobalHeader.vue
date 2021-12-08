@@ -1,9 +1,9 @@
 <template>
   <div class="main">
     <GlobalHeaderTitle></GlobalHeaderTitle>
-    <div/>
+    <div style="min-width: 10px"/>
     <GlobalHeaderSearchLine v-show="currentPage !== 'SearchPage'"></GlobalHeaderSearchLine>
-    <div/>
+    <div style="min-width: 10px"/>
     <GlobalHeaderNavigator :current-page="this.currentPage"></GlobalHeaderNavigator>
   </div>
 </template>
@@ -29,7 +29,7 @@ export default {
   min-height: 32px;
   max-height: 64px;
   backdrop-filter: saturate(200%) blur(30px);
-  background: rgba(250, 250, 250, 0.72);
-  box-shadow: 10px 10px 50px rgba(220, 220, 220, 0.72);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
 }
 </style>

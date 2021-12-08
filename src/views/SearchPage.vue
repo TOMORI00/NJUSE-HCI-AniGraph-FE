@@ -6,18 +6,18 @@
         <img id="search-page-icon" alt="fail" src="../assets/logo.png">
         <div id="search-page-title">AniGraph</div>
       </div>
-      <SearchInput></SearchInput>
+      <SearchPageInput></SearchPageInput>
     </div>
   </div>
 </template>
 
 <script>
 import GlobalHeader from "@/components/GlobalHeader";
-import SearchInput from "@/components/SearchInput";
+import SearchPageInput from "@/components/SearchPageInput";
 
 export default {
   name: "SearchPage",
-  components: { SearchInput, GlobalHeader },
+  components: { SearchPageInput, GlobalHeader },
   data() {
     return {
       currentPage: "SearchPage",
@@ -37,7 +37,7 @@ export default {
 #search-page-icon {
   width: 50px;
   height: 50px;
-  animation: rotate 5s infinite;
+  animation: rotate 8s infinite alternate;
 }
 
 @keyframes rotate {
