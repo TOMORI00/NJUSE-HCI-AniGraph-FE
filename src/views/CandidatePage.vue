@@ -12,19 +12,19 @@
            id="candidate-page-list"
            :key="i"
            class="candidate-page-list-content">
-        <img :src="item.image"
+        <img :src="getImageSrc(item.image)"
              alt=""
              class="candidate-page-list-content-background">
         <div style="text-align: center; width: 120px; height: 120px;">
           <img :src="getImageSrc(item.image)"
                alt="图片加载失败"
                class="candidate-page-list-content-img"
-               @click="toGraph(item.id)">
+               @click="toGraph(item.id, item.name_cn)">
         </div>
         <div class="candidate-page-list-content-description">
           <div class="candidate-page-list-content-title">
             <div class="candidate-page-list-content-title-name-cn"
-                 @click="toGraph(item.id)">{{ item.name_cn }}
+                 @click="toGraph(item.id, item.name_cn)">{{ item.name_cn }}
             </div>
             <div class="candidate-page-list-content-title-name">{{ item.name }}</div>
           </div>
@@ -38,14 +38,14 @@
 </template>
 
 <script>
-import {Spin as ASpin}from "ant-design-vue";
+import {Spin as ASpin} from "ant-design-vue";
 import GlobalHeader from "@/components/GlobalHeader";
 import CandidateNotFoundTip from "@/components/CandidateNotFoundTip";
-import { searchEntityByNameAPI } from "@/api";
+import {searchEntityByNameAPI} from "@/api";
 
 export default {
   name: "CandidatePage",
-  components: { CandidateNotFoundTip, GlobalHeader, ASpin },
+  components: {CandidateNotFoundTip, GlobalHeader, ASpin},
   data() {
     return {
       currentPage: "CandidatePage",
@@ -60,17 +60,17 @@ export default {
   mounted() {
     this.loadingCandidateContent = true;
     searchEntityByNameAPI(decodeURIComponent(String(this.$route.query.q)))
-        .then((res) => {
-          this.candidateContent = res.data.content;
-          this.loadingCandidateContent = false;
-          if (this.candidateContent.length === 0) {
-            this.noneCandidateContent = true;
-          }
-        });
+      .then((res) => {
+        this.candidateContent = res.data.content;
+        this.loadingCandidateContent = false;
+        if (this.candidateContent.length === 0) {
+          this.noneCandidateContent = true;
+        }
+      });
   },
   methods: {
-    toGraph(id) {
-      this.$router.push({ path: "/graph", query: { entityId: id } });
+    toGraph(id, name_cn) {
+      this.$router.push({path: "/graph", query: {entityId: id, q: name_cn}});
     },
 
     getImageSrc(image) {

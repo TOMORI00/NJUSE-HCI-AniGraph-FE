@@ -29,7 +29,7 @@ export default {
     const that = this;
     this.inputContent = String(this.$route.query.q);
     document.onkeydown = function () {
-      if (that.$router.currentRoute.path === "/candidate") {
+      if (that.$router.currentRoute.path === "/candidate" || that.$router.currentRoute.path === "/graph") {
         const key = window.event.keyCode;
         switch (key) {
           case 13:
@@ -59,7 +59,7 @@ export default {
 #global-header-search-line-input {
   border: none;
   height: 32px;
-  width: 240px;
+  width: 300px;
   padding-left: 10px;
   padding-right: 40px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.4);
