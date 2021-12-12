@@ -1,11 +1,7 @@
 <template>
   <div class="kg-wrapper">
-    <div id="kg-link-brief-introduction" v-if="currentLinkInfoVisible">
-      {{ currentLink.source.name_cn }}-->{{ currentLink.target.name_cn }}
-    </div>
-    <div id="kg-node-brief-introduction" v-if="currentNodeInfoVisible">
-      nodeInfo
-    </div>
+    <kg-link-brief-introduction id="kg-link-brief-introduction" v-if="currentLinkInfoVisible" :link="currentLink"/>
+    <kg-node-brief-introduction id="kg-node-brief-introduction" v-if="currentNodeInfoVisible" :node="currentNode"/>
   </div>
 </template>
 
@@ -13,10 +9,15 @@
 /* eslint-disable no-unused-vars */
 import * as d3 from "d3";
 import {getRelationsByEntityIdAPI} from "../api/relations";
+import KgLinkBriefIntroduction from "./KgLinkBriefIntroduction";
+import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
 
 export default {
   name: "KnowledgeGraph",
-  components: {},
+  components: {
+    KgLinkBriefIntroduction,
+    KgNodeBriefIntroduction
+  },
   data() {
     return {
       nodes: null,
