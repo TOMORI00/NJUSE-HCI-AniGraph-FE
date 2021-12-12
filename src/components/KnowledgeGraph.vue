@@ -1,5 +1,12 @@
 <template>
-  <div class="graph-wrapper"></div>
+  <div class="kg-wrapper">
+    <div id="kg-link-brief-introduction" v-if="currentLinkInfoVisible">
+      {{ currentLink.source.name_cn }}-->{{ currentLink.target.name_cn }}
+    </div>
+    <div id="kg-node-brief-introduction" v-if="currentNodeInfoVisible">
+      nodeInfo
+    </div>
+  </div>
 </template>
 
 <script>
@@ -15,15 +22,23 @@ export default {
       nodes: null,
       links: null,
       series: [],
-
-      nodeRadius: 13,
-
-      lastZoomEvent: null,
-
+      //
       w: null,
       h: null,
       svg: null,
       g: null,
+      //
+      nodeRadius: 13,
+      //
+      lastZoomEvent: null,
+      //
+      currentLink: null,
+      currentLinkInfoVisible: false,
+      linkTimer: null,
+      //
+      nodeTimer: null,
+      currentNode: null,
+      currentNodeInfoVisible: false,
     };
   },
   computed: {},
@@ -33,16 +48,16 @@ export default {
     this.nodes = res.data.content.Entities;
     this.links = res.data.content.Relations;
     this.w = document.body.clientWidth;
-    this.h = document.body.clientHeight - 64;
-    this.svg = d3.select(".graph-wrapper")
+    this.h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
+    let headerHeight = Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
+    this.svg = d3.select(".kg-wrapper")
       .append("svg")
       .attr("id", "kgSvg")
       .attr("viewBox", [0, 0, Math.max(this.w, 800), this.h]);
-    console.log(this.svg);
     this.initPage();
     window.onresize = function () {
       let w = document.documentElement.clientWidth;
-      let h = document.documentElement.clientHeight - 64;
+      let h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
       this.w = w;
       this.h = h;
       d3.select("#kgSvg").attr("viewBox", [0, 0, Math.max(w, 800), h]);
@@ -56,42 +71,42 @@ export default {
         links: _this.links,
       }, {
         nodeFill: _this.setNodeFill,
-        nodeTitle: d => d.id,
+        nodeTitle: d => d.name,
         nodeStrength: _this.setNodeStrength,
         nodeRadius: _this.setNodeRadius(null),
         // nodeCollision: _this.setNodeCollision,
         linkStroke: _this.setLinkFill,
         linkStrength: _this.setLinkStrength,
         linkDistance: _this.setLinkDistance,
-        linkStrokeWidth: _this.setLinkStrokeWidth(null),
         fontSize: 13,
         width: _this.w,
         height: _this.h,
       });
     },
 
-    initGraph({nodes, links}, {
-      nodeTitle,
-      nodeFill,
-      nodeStroke = "rgb(255,255,255)",
-      nodeStrokeWidth = 1.5,
-      nodeStrokeOpacity = 1,
-      nodeRadius = 12,
-      nodeStrength,
-      nodeCollision,
-      linkStroke = "#999",
-      linkStrokeOpacity = 0.35,
-      linkStrokeWidth = 2,
-      linkStrokeLinecap = "round",
-      linkStrength,
-      linkDistance,
-      markerSize = 6,
-      markerScale = 1,
-      fontSize = 12,
-      width,
-      height,
-      invalidation,
-    } = {}) {
+    initGraph({nodes, links},
+              {
+                nodeTitle,
+                nodeFill,
+                nodeStroke = "rgb(255,255,255)",
+                nodeStrokeWidth = 1.5,
+                nodeStrokeOpacity = 1,
+                nodeRadius = 12,
+                nodeStrength,
+                nodeCollision,
+                linkStroke = "#999",
+                linkStrokeOpacity = 0.35,
+                linkStrokeWidth = 3,
+                linkStrokeLinecap = "round",
+                linkStrength,
+                linkDistance,
+                markerSize = 6,
+                markerScale = 1,
+                fontSize = 12,
+                width,
+                height,
+                invalidation,
+              } = {}) {
       const _this = this;
 
       if (height === undefined || width === undefined) {
@@ -159,7 +174,7 @@ export default {
         .join("path")
         .attr("stroke", linkStroke)
         .attr("stroke-width", function (d) {
-          return typeof linkStrokeWidth !== "function" ? linkStrokeWidth : linkStrokeWidth(d);
+          return typeof linkStrokeWidth !== "function" ? String(linkStrokeWidth) + "px" : linkStrokeWidth(d);
         })
         .attr("stroke-dasharray", _this.setLinkStrokeDashArray)
         .attr("id", function (d) {
@@ -167,6 +182,27 @@ export default {
         })
         .attr("stroke-opacity", linkStrokeOpacity)
         .attr("stroke-linecap", linkStrokeLinecap)
+        .on("mouseover", function (event, d) {
+          window.clearTimeout(_this.linkTimer);
+          _this.linkTimer = window.setTimeout(async function () {
+            await _this.setLinkBriefIntroductionVisible(event, d);
+            await _this.handleLinkBriefIntroductionMouseout("kg-link-brief-introduction");
+            await _this.setLinkBriefIntroductionLocation(event, d);
+          }, 0);
+        })
+        .on("mouseout", function (event, d) {
+          if (event.toElement.id === "kg-link-brief-introduction") {
+            return;
+          } else {
+            window.clearTimeout(_this.linkTimer);
+            _this.linkTimer = window.setTimeout(function () {
+              _this.setLinkBriefIntroductionVisible(event, d);
+            }, 0);
+          }
+        })
+        .on("mousemove", function (event, d) {
+          _this.setLinkBriefIntroductionLocation(event, d);
+        })
         .attr("class", "link");
 
       let node = g.append("g")
@@ -180,48 +216,91 @@ export default {
         .attr("z-index", -100)
         .attr("fill", nodeFill)
         .attr("class", "node")
+        .attr("id", function (d) {
+          return "node-" + d.id;
+        })
         .on("dblclick", _this.handleNodeDblclick)
+        .on("mouseover", function (event, d) {
+          if (d === _this.currentNode) {
+            window.clearTimeout(_this.nodeTimer);
+          }
+          _this.nodeTimer = window.setTimeout(async function () {
+            handleNodeMouseover(event, d);
+            await _this.setNodeBriefIntroductionVisible(event, d);
+            await _this.handleNodeBriefIntroductionMouseout("kg-node-brief-introduction");
+            await _this.setNodeBriefIntroductionLocation(event, d);
+          }, 100);
+        })
+        .on("mousemove", function (event, d) {
+          _this.setNodeBriefIntroductionLocation(event, d);
+        })
+        .on("mouseout", function (event, d) {
+          _this.setNodeBriefIntroductionVisible(event, d);
+          window.clearTimeout(_this.nodeTimer);
+          _this.nodeTimer = window.setTimeout(function () {
+            if (!_this.currentNodeInfoVisible) {
+              handleNodeMouseout(event, d);
+            }
+          }, 100);
+        })
         .call(drag(simulation));
-      // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
-      if (nodeTitle !== undefined) {
-        node.append("title")
-          .text(function (d) {
-            return nodeTitle(d);
-          });
-      }
+      // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
+      // if (nodeTitle !== undefined) {
+      //   node.append("title")
+      //     .text(function (d) {
+      //       return nodeTitle(d);
+      //     });
+      // }
+
+      let defs = g.append("defs");
+      let circleTextFilter = defs
+        .append("filter")
+        .attr("id", "nodeTextBg")
+        .attr("x", -0.05)
+        .attr("y", -0.05)
+        .attr("width", 1.1)
+        .attr("height", 1.1);
+
+      circleTextFilter.append("feFlood")
+        .attr("flood-color", "#fff")
+        .attr("flood-opacity", "1");
+
+      circleTextFilter.append("feComposite")
+        .attr("in", "SourceGraphic")
+        .attr("operator", "over");
+
+      let linkText = g.append("g")
+        .selectAll(".linkText")
+        .data(links)
+        .join("text")
+        .attr("id", d => "linkText-" + d.id)
+        .attr("font-size", fontSize)
+        .attr("display", "none")
+        .attr("dy", "-0.5em")
+        .attr("class", "linkText")
+        .append("textPath")
+        .attr("xlink:href", function (d) {
+          return ("#link-" + d.id);
+        })
+        .style("text-anchor", "middle")
+        .attr("startOffset", "50%")
+        .text(d => d.name);
 
       let nodeText = g.append("g")
         .selectAll(".nodeText")
         .data(nodes)
         .join("text")
-        .text(d => {
-          return (d.name_cn !== "" && d.name_cn !== null) ? d.name_cn : d.name;
-        })
+        .text(d => d.name_cn)
+        .attr("id", d => "nodeText-" + d.id)
         .attr("font-size", fontSize)
         .attr("dx", function () {
           return String(this.getBoundingClientRect().width / fontSize / 2 * -1) + "em";
         })
         .attr("dy", "2em")
+        .attr("filter", "url(#nodeTextBg)")
         .attr("class", "nodeText");
 
-      // let linkText = g.append("g")
-      //   .selectAll(".linkText")
-      //   .data(links)
-      //   .join("text")
-      //   .attr("dy", -5)
-      //   .attr("id", d => "linkText" + d.id)
-      //   .attr("font-size", fontSize)
-      //   .attr("display", "unset")
-      //   .attr("class", "linkText")
-      //   .append("textPath")
-      //   .attr("xlink:href", function (d) {
-      //     return ("#link-" + d.id);
-      //   })
-      //   .style("text-anchor", "middle")
-      //   .attr("startOffset", "50%")
-      //   .text(d => d.name);
-
-      let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.5, 4]).on("zoom", zoom);
+      let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.125, 8]).on("zoom", zoom);
 
       _this.svg
         .call(svgZoom)
@@ -243,6 +322,8 @@ export default {
           g.selectAll("path")
             .attr("stroke-width", linkStrokeWidth / event.transform.k);
           g.selectAll(".nodeText")
+            .attr("font-size", fontSize / event.transform.k);
+          g.selectAll(".linkText")
             .attr("font-size", fontSize / event.transform.k);
         }
       }
@@ -305,6 +386,58 @@ export default {
           .on("drag", dragged)
           .on("end", dragended);
       }
+
+      function handleNodeMouseover(event, d) {
+        let relatedNodes = [];
+        for (let i = 0; i < link._groups[0].length; i++) {
+          let l = link._groups[0][i].__data__;
+          // if (l.source.id === d.id || (l.type ==="series" && l.target.id === d.id)) {
+          if (l.source.id === d.id || l.target.id === d.id) {
+            relatedNodes.push(l.source.id);
+            relatedNodes.push(l.target.id);
+            d3.select("#link-" + l.id)
+              // .attr("stroke-width", linkStrokeWidth + 1)
+              .attr("stroke", "blue");
+            d3.select("#linkText-" + l.id)
+              .attr("display", "unset");
+          }
+        }
+        relatedNodes = Array.from(new Set(relatedNodes));
+        for (let i = 0; i < node._groups[0].length; i++) {
+          let n = node._groups[0][i].__data__;
+          if (relatedNodes.indexOf(n.id) !== -1) {
+            d3.select("#node-" + n.id)
+              .attr("stroke-width", nodeStrokeWidth + 1)
+              .attr("stroke", "blue");
+          }
+        }
+      }
+
+      function handleNodeMouseout(event, d) {
+        let relatedNodes = [];
+        for (let i = 0; i < link._groups[0].length; i++) {
+          let l = link._groups[0][i].__data__;
+          // if (l.source.id === d.id || (l.type ==="series" && l.target.id === d.id)) {
+          if (l.source.id === d.id || l.target.id === d.id) {
+            relatedNodes.push(l.source.id);
+            relatedNodes.push(l.target.id);
+            d3.select("#link-" + l.id)
+              // .attr("stroke-width", linkStrokeWidth)
+              .attr("stroke", linkStroke);
+            d3.select("#linkText-" + l.id)
+              .attr("display", "none");
+          }
+        }
+        relatedNodes = Array.from(new Set(relatedNodes));
+        for (let i = 0; i < node._groups[0].length; i++) {
+          let n = node._groups[0][i].__data__;
+          if (relatedNodes.indexOf(n.id) !== -1) {
+            d3.select("#node-" + n.id)
+              .attr("stroke-width", nodeStrokeWidth)
+              .attr("stroke", nodeStroke);
+          }
+        }
+      }
     },
 
     setLinkStrokeDashArray(d) {
@@ -343,11 +476,11 @@ export default {
     },
 
     setLinkStrength(d) {
-      return 0.1;
+      return 0.15;
     },
 
     setLinkDistance(d) {
-      return d.type !== "series" ? this.nodeRadius * 4 : this.nodeRadius * 16;
+      return d.type !== "series" ? this.nodeRadius * 10 : this.nodeRadius * 35;
     },
 
     setLinkFill(d) {
@@ -421,16 +554,90 @@ export default {
       }
       this.nodes = newNodes;
 
-      // let parent = document.getElementsByClassName("graph-wrapper")[0];
+      // let parent = document.getElementsByClassName("kg-wrapper")[0];
       // let child = document.getElementById("kgSvg");
       // parent.removeChild(child);
       this.g.remove();
       this.initPage();
     },
+
+    setLinkBriefIntroductionVisible(event, d) {
+      const _this = this;
+      if (event.type === "mouseover") {
+        _this.currentLink = d;
+        _this.currentLinkInfoVisible = true;
+      } else if (event.type === "mouseout") {
+        _this.currentLink = null;
+        _this.currentLinkInfoVisible = false;
+      }
+    },
+
+    setLinkBriefIntroductionLocation(event, d) {
+      const _this = this;
+      if (_this.currentLinkInfoVisible) {
+        let linkBriefIntroduction = document.getElementById("kg-link-brief-introduction");
+        linkBriefIntroduction.style.top = String(event.offsetY - linkBriefIntroduction.offsetHeight) + "px";
+        linkBriefIntroduction.style.left = String(event.offsetX) + "px";
+      }
+    },
+
+    handleLinkBriefIntroductionMouseout(id) {
+      const _this = this;
+      let element = document.getElementById(id);
+      element.onmouseout = function (event) {
+        if (event.toElement.id !== "link-" + String(_this.currentLink.id)) {
+          _this.currentLinkInfoVisible = false;
+          _this.currentLink = null;
+        }
+      };
+    },
+
+    setNodeBriefIntroductionVisible(event, d) {
+      const _this = this;
+      if (event.type === "mouseover") {
+        _this.currentNode = d;
+        _this.currentNodeInfoVisible = true;
+      } else if (event.type === "mouseout") {
+        _this.currentNode = null;
+        _this.currentNodeInfoVisible = false;
+      }
+    },
+
+    setNodeBriefIntroductionLocation(event, d) {
+      const _this = this;
+      if (_this.currentNodeInfoVisible) {
+        let nodeBriefIntroduction = document.getElementById("kg-node-brief-introduction");
+        nodeBriefIntroduction.style.top = String(event.offsetY - nodeBriefIntroduction.offsetHeight - 6) + "px";
+        nodeBriefIntroduction.style.left = String(event.offsetX + 6) + "px";
+      }
+    },
+
+    handleNodeBriefIntroductionMouseout(id) {
+      const _this = this;
+      let element = document.getElementById(id);
+      element.onmouseout = function (event) {
+        if (event.toElement.id !== "node-" + String(_this.currentNode.id)) {
+          _this.currentLNodeInfoVisible = false;
+          _this.currentLNode = null;
+        }
+      };
+    },
   }
 };
 </script>
 
-<style scoped>
+<style>
+.kg-wrapper {
+  position: relative;
+}
 
+#kg-link-brief-introduction {
+  position: absolute;
+  background: aliceblue;
+}
+
+#kg-node-brief-introduction {
+  position: absolute;
+  background: aliceblue;
+}
 </style>
