@@ -640,11 +640,21 @@ export default {
 
 #kg-link-brief-introduction {
   position: absolute;
-  background: aliceblue;
+  backdrop-filter: saturate(100%) blur(30px);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
 }
 
 #kg-node-brief-introduction {
   position: absolute;
-  background: aliceblue;
+  backdrop-filter: saturate(100%) blur(10px);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
 }
 </style>
