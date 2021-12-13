@@ -397,8 +397,7 @@ export default {
             relatedNodes.push(l.source.id);
             relatedNodes.push(l.target.id);
             d3.select("#link-" + l.id)
-              // .attr("stroke-width", linkStrokeWidth + 1)
-              .attr("stroke", "blue");
+              .attr("stroke", "#096dd9");
             d3.select("#linkText-" + l.id)
               .attr("display", "unset");
           }
@@ -408,8 +407,10 @@ export default {
           let n = node._groups[0][i].__data__;
           if (relatedNodes.indexOf(n.id) !== -1) {
             d3.select("#node-" + n.id)
-              .attr("stroke-width", nodeStrokeWidth + 1)
-              .attr("stroke", "blue");
+              .attr("stroke-width", _this.lastZoomEvent === null ?
+                (nodeStrokeWidth + 1) :
+                ((nodeStrokeWidth + 1) / Math.max(1, _this.lastZoomEvent.transform.k)))
+              .attr("stroke", "#096dd9");
           }
         }
       }
@@ -423,7 +424,6 @@ export default {
             relatedNodes.push(l.source.id);
             relatedNodes.push(l.target.id);
             d3.select("#link-" + l.id)
-              // .attr("stroke-width", linkStrokeWidth)
               .attr("stroke", linkStroke);
             d3.select("#linkText-" + l.id)
               .attr("display", "none");
@@ -434,7 +434,9 @@ export default {
           let n = node._groups[0][i].__data__;
           if (relatedNodes.indexOf(n.id) !== -1) {
             d3.select("#node-" + n.id)
-              .attr("stroke-width", nodeStrokeWidth)
+              .attr("stroke-width", _this.lastZoomEvent === null ?
+                nodeStrokeWidth :
+                (nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k)))
               .attr("stroke", nodeStroke);
           }
         }
@@ -481,7 +483,7 @@ export default {
     },
 
     setLinkDistance(d) {
-      return d.type !== "series" ? this.nodeRadius * 10 : this.nodeRadius * 35;
+      return d.type !== "series" ? this.nodeRadius * 8 : this.nodeRadius * 20;
     },
 
     setLinkFill(d) {
@@ -558,6 +560,10 @@ export default {
       // let parent = document.getElementsByClassName("kg-wrapper")[0];
       // let child = document.getElementById("kgSvg");
       // parent.removeChild(child);
+      this.currentLinkInfoVisible = false;
+      this.currentLink = null;
+      this.currentNodeInfoVisible = false;
+      this.currentNode = null;
       this.g.remove();
       this.initPage();
     },
