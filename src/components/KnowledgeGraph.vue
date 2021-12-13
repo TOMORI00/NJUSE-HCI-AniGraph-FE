@@ -1,7 +1,5 @@
 <template>
-  <div class="kg-wrapper">
-    <kg-link-brief-introduction id="kg-link-brief-introduction" v-if="currentLinkInfoVisible" :link="currentLink"/>
-    <kg-node-brief-introduction id="kg-node-brief-introduction" v-if="currentNodeInfoVisible" :node="currentNode"/>
+  <div id="kg-wrapper" @contextmenu.prevent="">
   </div>
 </template>
 
@@ -15,8 +13,8 @@ import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
 export default {
   name: "KnowledgeGraph",
   components: {
-    KgLinkBriefIntroduction,
-    KgNodeBriefIntroduction
+    // KgLinkBriefIntroduction,
+    // KgNodeBriefIntroduction
   },
   data() {
     return {
@@ -51,7 +49,11 @@ export default {
     this.w = document.body.clientWidth;
     this.h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
     let headerHeight = Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
-    this.svg = d3.select(".kg-wrapper")
+
+    let kgWrapper = document.getElementById("kg-wrapper");
+    kgWrapper.style.height = this.h + "px";
+
+    this.svg = d3.select("#kg-wrapper")
       .append("svg")
       .attr("id", "kgSvg")
       .attr("viewBox", [0, 0, Math.max(this.w, 800), this.h]);
@@ -90,7 +92,7 @@ export default {
                 nodeTitle,
                 nodeFill,
                 nodeStroke = "rgb(255,255,255)",
-                nodeStrokeWidth = 1.5,
+                nodeStrokeWidth = 2,
                 nodeStrokeOpacity = 1,
                 nodeRadius = 12,
                 nodeStrength,
@@ -129,11 +131,13 @@ export default {
       if (linkDistance !== undefined) {
         forceLink.distance(linkDistance);
       }
+      let wCenter = width / 2;
+      let hCenter = height / 2;
       const simulation = d3.forceSimulation(nodes)
         .force("link", forceLink)
         .force("charge", forceNode)
         .force("collision", forceCollision)
-        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("center", d3.forceCenter(wCenter, hCenter))
         .on("tick", ticked);
 
       _this.g = _this.svg.append("g");
@@ -244,6 +248,22 @@ export default {
             }
           }, 100);
         })
+        .on("click", function (event, d) {
+          // let transformK = _this.lastZoomEvent.transform.k;
+          // let transformX = _this.lastZoomEvent.transform.x;
+          // let transformY = _this.lastZoomEvent.transform.y;
+          // let k = 1.5;
+          // _this.svg.call(svgZoom.transform, d3.zoomIdentity
+          //   .scale(k)
+          //   .translate(((k / transformK) * (transformX - width * 0.5) + width * 0.5) / k, ((k / transformK) * (transformY - height * 0.5) + height * 0.5) / k)
+          // );
+
+          // wCenter = wCenter + width / 2 - d.x;
+          // hCenter = hCenter + height / 2 - d.y;
+          // simulation.force("center", d3.forceCenter(wCenter, hCenter));
+          // simulation.restart();
+          // _this.svg.call(svgZoom.transform, d3.zoomIdentity);
+        })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
       // if (nodeTitle !== undefined) {
@@ -303,12 +323,14 @@ export default {
 
       let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.125, 8]).on("zoom", zoom);
 
-      _this.svg
-        .call(svgZoom)
-        .on("dblclick.zoom", null);
+      // _this.svg
+      //   .call(svgZoom)
+      //   .on("dblclick.zoom", null);
 
       if (_this.lastZoomEvent !== null) {
         zoom(_this.lastZoomEvent);
+      } else {
+        _this.svg.call(svgZoom.transform, d3.zoomIdentity);
       }
 
       if (invalidation != null) invalidation.then(() => simulation.stop());
@@ -383,7 +405,11 @@ export default {
         }
 
         return d3.drag()
-          .on("start", dragstarted)
+          .on("start", function (event) {
+            _this.currentNodeInfoVisible = false;
+            _this.currentNode = null;
+            dragstarted(event);
+          })
           .on("drag", dragged)
           .on("end", dragended);
       }
@@ -407,9 +433,7 @@ export default {
           let n = node._groups[0][i].__data__;
           if (relatedNodes.indexOf(n.id) !== -1) {
             d3.select("#node-" + n.id)
-              .attr("stroke-width", _this.lastZoomEvent === null ?
-                (nodeStrokeWidth + 1) :
-                ((nodeStrokeWidth + 1) / Math.max(1, _this.lastZoomEvent.transform.k)))
+              .attr("stroke-width", (nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k)))
               .attr("stroke", "#096dd9");
           }
         }
@@ -434,9 +458,7 @@ export default {
           let n = node._groups[0][i].__data__;
           if (relatedNodes.indexOf(n.id) !== -1) {
             d3.select("#node-" + n.id)
-              .attr("stroke-width", _this.lastZoomEvent === null ?
-                nodeStrokeWidth :
-                (nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k)))
+              .attr("stroke-width", nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k))
               .attr("stroke", nodeStroke);
           }
         }
@@ -634,8 +656,10 @@ export default {
 </script>
 
 <style>
-.kg-wrapper {
+#kg-wrapper {
   position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 #kg-link-brief-introduction {

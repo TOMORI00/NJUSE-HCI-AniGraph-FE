@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="graph-page">
     <global-header/>
     <knowledge-graph/>
   </div>
@@ -17,6 +17,8 @@ export default {
   },
 };
 </script>
-
 <style scoped>
+.graph-page {
+  height: 100%;
+}
 </style>
