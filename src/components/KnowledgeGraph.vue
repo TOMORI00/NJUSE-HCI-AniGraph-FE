@@ -1,7 +1,7 @@
 <template>
   <div id="kg-wrapper" @contextmenu.prevent>
-    <kg-link-brief-introduction v-show="currentLinkInfoVisible" id="kg-link-brief-introduction" :link="currentLink"/>
-    <kg-node-brief-introduction v-show="currentNodeInfoVisible" id="kg-node-brief-introduction" :node="currentNode"/>
+    <kg-link-brief-introduction v-if="currentLinkInfoVisible" id="kg-link-brief-introduction" :link="currentLink"/>
+    <kg-node-brief-introduction v-if="currentNodeInfoVisible" id="kg-node-brief-introduction" :node="currentNode"/>
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
       <KgDrawerContent :data="drawerData"></KgDrawerContent>
     </KgDrawer>

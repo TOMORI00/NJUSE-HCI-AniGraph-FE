@@ -15,6 +15,10 @@ export default {
     GlobalHeader,
     KnowledgeGraph,
   },
+  mounted() {
+    document.styleSheets[0].insertRule("#app {overflow-y: scroll;}", 0);
+    document.styleSheets[0].insertRule("#app::-webkit-scrollbar {width: 0;}", 0);
+  }
 };
 </script>
 <style scoped>
