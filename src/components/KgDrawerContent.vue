@@ -9,10 +9,10 @@
         {{ data.name }}
       </div>
       <div v-if="String(data.id)[0] === '1'">
-        播出时间:{{data.air_date}}
+        播出时间:{{ data.air_date }}
       </div>
       <div v-if="String(data.id)[0] === '1'">
-        集数:{{data.ep_num}}
+        集数:{{ data.ep_num }}
       </div>
       <div id="kg-drawer-content-info-summary">{{ data.summary }}
       </div>

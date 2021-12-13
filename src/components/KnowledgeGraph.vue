@@ -1,7 +1,7 @@
 <template>
   <div id="kg-wrapper" @contextmenu.prevent>
-    <kg-link-brief-introduction v-if="currentLinkInfoVisible" id="kg-link-brief-introduction" :link="currentLink"/>
-    <kg-node-brief-introduction v-if="currentNodeInfoVisible" id="kg-node-brief-introduction" :node="currentNode"/>
+    <kg-link-brief-introduction v-show="currentLinkInfoVisible" id="kg-link-brief-introduction" :link="currentLink"/>
+    <kg-node-brief-introduction v-show="currentNodeInfoVisible" id="kg-node-brief-introduction" :node="currentNode"/>
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
       <KgDrawerContent :data="drawerData"></KgDrawerContent>
     </KgDrawer>
@@ -162,72 +162,72 @@ export default {
       let g = _this.g;
 
       let markerEnd = g.append("g")
-          .append("marker")
-          .attr("id", "arrowheadEnd")
-          .attr("viewBox", "0 -" + String(markerSize) + " " + String(2 * markerSize) + " " + String(2 * markerSize))
-          .attr("refX", (2 * markerSize + (nodeRadius + nodeStrokeWidth / 2 - linkStrokeWidth) / markerScale))
-          .attr("refY", 0)
-          .attr("orient", "auto")
-          .attr("markerWidth", markerSize * markerScale)
-          .attr("markerHeight", markerSize * markerScale)
-          .attr("xoverflow", "visible")
-          .append("svg:path")
-          .attr("d", "M 0,-" + String(markerSize) + " L " + String(2 * markerSize) + ",0 L 0," + String(markerSize))
-          .attr("stroke-opacity", 0.8)
-          .attr("fill", "darkgrey");
+        .append("marker")
+        .attr("id", "arrowheadEnd")
+        .attr("viewBox", "0 -" + String(markerSize) + " " + String(2 * markerSize) + " " + String(2 * markerSize))
+        .attr("refX", (2 * markerSize + (nodeRadius + nodeStrokeWidth / 2 - linkStrokeWidth) / markerScale))
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", markerSize * markerScale)
+        .attr("markerHeight", markerSize * markerScale)
+        .attr("xoverflow", "visible")
+        .append("svg:path")
+        .attr("d", "M 0,-" + String(markerSize) + " L " + String(2 * markerSize) + ",0 L 0," + String(markerSize))
+        .attr("stroke-opacity", 0.8)
+        .attr("fill", "darkgrey");
 
       let markerStart = g.append("g")
-          .append("marker")
-          .attr("id", "arrowheadStart")
-          .attr("viewBox", "0 -" + String(markerSize) + " " + String(2 * markerSize) + " " + String(2 * markerSize))
-          .attr("refX", (0 - nodeRadius - nodeStrokeWidth / 2 + linkStrokeWidth) / markerScale)
-          .attr("refY", 0)
-          .attr("orient", "auto")
-          .attr("markerWidth", markerSize * markerScale)
-          .attr("markerHeight", markerSize * markerScale)
-          .attr("xoverflow", "visible")
-          .append("svg:path")
-          .attr("d", "M " + String(2 * markerSize) + ",-" + String(markerSize) + " L 0,0 L " + String(2 * markerSize) + "," + String(markerSize))
-          .attr("stroke-opacity", 0.8)
-          .attr("fill", "darkgrey");
+        .append("marker")
+        .attr("id", "arrowheadStart")
+        .attr("viewBox", "0 -" + String(markerSize) + " " + String(2 * markerSize) + " " + String(2 * markerSize))
+        .attr("refX", (0 - nodeRadius - nodeStrokeWidth / 2 + linkStrokeWidth) / markerScale)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", markerSize * markerScale)
+        .attr("markerHeight", markerSize * markerScale)
+        .attr("xoverflow", "visible")
+        .append("svg:path")
+        .attr("d", "M " + String(2 * markerSize) + ",-" + String(markerSize) + " L 0,0 L " + String(2 * markerSize) + "," + String(markerSize))
+        .attr("stroke-opacity", 0.8)
+        .attr("fill", "darkgrey");
 
       let link = g.append("g")
-          .selectAll(".link")
-          .data(links)
-          .join("path")
-          .attr("stroke", linkStroke)
-          .attr("stroke-width", function (d) {
-            return typeof linkStrokeWidth !== "function" ? String(linkStrokeWidth) + "px" : linkStrokeWidth(d);
-          })
-          .attr("stroke-dasharray", _this.setLinkStrokeDashArray)
-          .attr("id", function (d) {
-            return ("link-" + d.id);
-          })
-          .attr("stroke-opacity", linkStrokeOpacity)
-          .attr("stroke-linecap", linkStrokeLinecap)
-          .on("mouseover", function (event, d) {
-            window.clearTimeout(_this.linkTimer);
-            _this.linkTimer = window.setTimeout(async function () {
-              await _this.setLinkBriefIntroductionVisible(event, d);
-              await _this.handleLinkBriefIntroductionMouseout("kg-link-brief-introduction");
-              await _this.setLinkBriefIntroductionLocation(event, d);
-            }, 0);
-          })
-          .on("mouseout", function (event, d) {
-            // eslint-disable-next-line no-empty
-            if (event.toElement.id === "kg-link-brief-introduction") {
+        .selectAll(".link")
+        .data(links)
+        .join("path")
+        .attr("stroke", linkStroke)
+        .attr("stroke-width", function (d) {
+          return typeof linkStrokeWidth !== "function" ? String(linkStrokeWidth) + "px" : linkStrokeWidth(d);
+        })
+        .attr("stroke-dasharray", _this.setLinkStrokeDashArray)
+        .attr("id", function (d) {
+          return ("link-" + d.id);
+        })
+        .attr("stroke-opacity", linkStrokeOpacity)
+        .attr("stroke-linecap", linkStrokeLinecap)
+        .on("mouseover", function (event, d) {
+          window.clearTimeout(_this.linkTimer);
+          _this.linkTimer = window.setTimeout(async function () {
+            await _this.setLinkBriefIntroductionVisible(event, d);
+            await _this.handleLinkBriefIntroductionMouseout("kg-link-brief-introduction");
+            await _this.setLinkBriefIntroductionLocation(event, d);
+          }, 0);
+        })
+        .on("mouseout", function (event, d) {
+          // eslint-disable-next-line no-empty
+          if (event.toElement.id === "kg-link-brief-introduction") {
 
-            } else {
-              window.clearTimeout(_this.linkTimer);
-              _this.linkTimer = window.setTimeout(function () {
-                _this.setLinkBriefIntroductionVisible(event, d);
-              }, 0);
-            }
-          })
-          .on("mousemove", function (event, d) {
-            _this.setLinkBriefIntroductionLocation(event, d);
-          })
-          .attr("class", "link");
+          } else {
+            window.clearTimeout(_this.linkTimer);
+            _this.linkTimer = window.setTimeout(function () {
+              _this.setLinkBriefIntroductionVisible(event, d);
+            }, 0);
+          }
+        })
+        .on("mousemove", function (event, d) {
+          _this.setLinkBriefIntroductionLocation(event, d);
+        })
+        .attr("class", "link");
 
       let node = g.append("g")
         .selectAll(".node")
