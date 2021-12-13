@@ -18,5 +18,6 @@ export default {
   padding: 0;
   margin: 0;
   min-width: 800px;
+  height: 100%;
 }
 </style>

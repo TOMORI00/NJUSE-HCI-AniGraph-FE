@@ -1,5 +1,5 @@
 <template>
-  <div class="kg-wrapper" @contextmenu.prevent>
+  <div id="kg-wrapper" @contextmenu.prevent>
     <kg-link-brief-introduction v-if="currentLinkInfoVisible" id="kg-link-brief-introduction" :link="currentLink"/>
     <kg-node-brief-introduction v-if="currentNodeInfoVisible" id="kg-node-brief-introduction" :node="currentNode"/>
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
@@ -67,10 +67,14 @@ export default {
     this.w = document.body.clientWidth;
     this.h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
     let headerHeight = Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
-    this.svg = d3.select(".kg-wrapper")
-        .append("svg")
-        .attr("id", "kgSvg")
-        .attr("viewBox", [0, 0, Math.max(this.w, 800), this.h]);
+
+    let kgWrapper = document.getElementById("kg-wrapper");
+    kgWrapper.style.height = this.h + "px";
+
+    this.svg = d3.select("#kg-wrapper")
+      .append("svg")
+      .attr("id", "kgSvg")
+      .attr("viewBox", [0, 0, Math.max(this.w, 800), this.h]);
     this.initPage();
     window.onresize = function () {
       let w = document.documentElement.clientWidth;
@@ -106,7 +110,7 @@ export default {
                 nodeTitle,
                 nodeFill,
                 nodeStroke = "rgb(255,255,255)",
-                nodeStrokeWidth = 1.5,
+                nodeStrokeWidth = 2,
                 nodeStrokeOpacity = 1,
                 nodeRadius = 12,
                 nodeStrength,
@@ -145,12 +149,14 @@ export default {
       if (linkDistance !== undefined) {
         forceLink.distance(linkDistance);
       }
+      let wCenter = width / 2;
+      let hCenter = height / 2;
       const simulation = d3.forceSimulation(nodes)
-          .force("link", forceLink)
-          .force("charge", forceNode)
-          .force("collision", forceCollision)
-          .force("center", d3.forceCenter(width / 2, height / 2))
-          .on("tick", ticked);
+        .force("link", forceLink)
+        .force("charge", forceNode)
+        .force("collision", forceCollision)
+        .force("center", d3.forceCenter(wCenter, hCenter))
+        .on("tick", ticked);
 
       _this.g = _this.svg.append("g");
       let g = _this.g;
@@ -224,48 +230,64 @@ export default {
           .attr("class", "link");
 
       let node = g.append("g")
-          .selectAll(".node")
-          .data(nodes)
-          .join("circle")
-          .attr("r", nodeRadius)
-          .attr("stroke", nodeStroke)
-          .attr("stroke-width", nodeStrokeWidth)
-          .attr("stroke-opacity", nodeStrokeOpacity)
-          .attr("z-index", -100)
-          .attr("fill", nodeFill)
-          .attr("class", "node")
-          .attr("id", function (d) {
-            return "node-" + d.id;
-          })
-          .on("dblclick", _this.handleNodeDblclick)
-          .on("mouseover", function (event, d) {
-            if (d === _this.currentNode) {
-              window.clearTimeout(_this.nodeTimer);
-            }
-            _this.nodeTimer = window.setTimeout(async function () {
-              handleNodeMouseover(event, d);
-              await _this.setNodeBriefIntroductionVisible(event, d);
-              await _this.handleNodeBriefIntroductionMouseout("kg-node-brief-introduction");
-              await _this.setNodeBriefIntroductionLocation(event, d);
-            }, 100);
-          })
-          .on("mousemove", function (event, d) {
-            _this.setNodeBriefIntroductionLocation(event, d);
-          })
-          .on("mouseout", function (event, d) {
-            _this.setNodeBriefIntroductionVisible(event, d);
+        .selectAll(".node")
+        .data(nodes)
+        .join("circle")
+        .attr("r", nodeRadius)
+        .attr("stroke", nodeStroke)
+        .attr("stroke-width", nodeStrokeWidth)
+        .attr("stroke-opacity", nodeStrokeOpacity)
+        .attr("z-index", -100)
+        .attr("fill", nodeFill)
+        .attr("class", "node")
+        .attr("id", function (d) {
+          return "node-" + d.id;
+        })
+        .on("dblclick", _this.handleNodeDblclick)
+        .on("mouseover", function (event, d) {
+          if (d === _this.currentNode) {
             window.clearTimeout(_this.nodeTimer);
-            _this.nodeTimer = window.setTimeout(function () {
-              if (!_this.currentNodeInfoVisible) {
-                handleNodeMouseout(event, d);
-              }
-            }, 100);
-          })
-          .on("contextmenu", function (event, d) {
-            _this.drawerDisplay = true;
-            _this.drawerData = d;
-          })
-          .call(drag(simulation));
+          }
+          _this.nodeTimer = window.setTimeout(async function () {
+            handleNodeMouseover(event, d);
+            await _this.setNodeBriefIntroductionVisible(event, d);
+            await _this.handleNodeBriefIntroductionMouseout("kg-node-brief-introduction");
+            await _this.setNodeBriefIntroductionLocation(event, d);
+          }, 100);
+        })
+        .on("mousemove", function (event, d) {
+          _this.setNodeBriefIntroductionLocation(event, d);
+        })
+        .on("mouseout", function (event, d) {
+          _this.setNodeBriefIntroductionVisible(event, d);
+          window.clearTimeout(_this.nodeTimer);
+          _this.nodeTimer = window.setTimeout(function () {
+            if (!_this.currentNodeInfoVisible) {
+              handleNodeMouseout(event, d);
+            }
+          }, 100);
+        })
+        .on("contextmenu", function (event, d) {
+          _this.drawerDisplay = true;
+          _this.drawerData = d;
+        })
+        .on("click", function (event, d) {
+          // let transformK = _this.lastZoomEvent.transform.k;
+          // let transformX = _this.lastZoomEvent.transform.x;
+          // let transformY = _this.lastZoomEvent.transform.y;
+          // let k = 1.5;
+          // _this.svg.call(svgZoom.transform, d3.zoomIdentity
+          //   .scale(k)
+          //   .translate(((k / transformK) * (transformX - width * 0.5) + width * 0.5) / k, ((k / transformK) * (transformY - height * 0.5) + height * 0.5) / k)
+          // );
+
+          // wCenter = wCenter + width / 2 - d.x;
+          // hCenter = hCenter + height / 2 - d.y;
+          // simulation.force("center", d3.forceCenter(wCenter, hCenter));
+          // simulation.restart();
+          // _this.svg.call(svgZoom.transform, d3.zoomIdentity);
+        })
+        .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
       // if (nodeTitle !== undefined) {
       //   node.append("title")
@@ -276,60 +298,62 @@ export default {
 
       let defs = g.append("defs");
       let circleTextFilter = defs
-          .append("filter")
-          .attr("id", "nodeTextBg")
-          .attr("x", -0.05)
-          .attr("y", -0.05)
-          .attr("width", 1.1)
-          .attr("height", 1.1);
+        .append("filter")
+        .attr("id", "nodeTextBg")
+        .attr("x", -0.05)
+        .attr("y", -0.05)
+        .attr("width", 1.1)
+        .attr("height", 1.1);
 
       circleTextFilter.append("feFlood")
-          .attr("flood-color", "#fff")
-          .attr("flood-opacity", "1");
+        .attr("flood-color", "#fff")
+        .attr("flood-opacity", "1");
 
       circleTextFilter.append("feComposite")
-          .attr("in", "SourceGraphic")
-          .attr("operator", "over");
+        .attr("in", "SourceGraphic")
+        .attr("operator", "over");
 
       let linkText = g.append("g")
-          .selectAll(".linkText")
-          .data(links)
-          .join("text")
-          .attr("id", d => "linkText-" + d.id)
-          .attr("font-size", fontSize)
-          .attr("display", "none")
-          .attr("dy", "-0.5em")
-          .attr("class", "linkText")
-          .append("textPath")
-          .attr("xlink:href", function (d) {
-            return ("#link-" + d.id);
-          })
-          .style("text-anchor", "middle")
-          .attr("startOffset", "50%")
-          .text(d => d.name);
+        .selectAll(".linkText")
+        .data(links)
+        .join("text")
+        .attr("id", d => "linkText-" + d.id)
+        .attr("font-size", fontSize)
+        .attr("display", "none")
+        .attr("dy", "-0.5em")
+        .attr("class", "linkText")
+        .append("textPath")
+        .attr("xlink:href", function (d) {
+          return ("#link-" + d.id);
+        })
+        .style("text-anchor", "middle")
+        .attr("startOffset", "50%")
+        .text(d => d.name);
 
       let nodeText = g.append("g")
-          .selectAll(".nodeText")
-          .data(nodes)
-          .join("text")
-          .text(d => d.name_cn)
-          .attr("id", d => "nodeText-" + d.id)
-          .attr("font-size", fontSize)
-          .attr("dx", function () {
-            return String(this.getBoundingClientRect().width / fontSize / 2 * -1) + "em";
-          })
-          .attr("dy", "2em")
-          .attr("filter", "url(#nodeTextBg)")
-          .attr("class", "nodeText");
+        .selectAll(".nodeText")
+        .data(nodes)
+        .join("text")
+        .text(d => d.name_cn)
+        .attr("id", d => "nodeText-" + d.id)
+        .attr("font-size", fontSize)
+        .attr("dx", function () {
+          return String(this.getBoundingClientRect().width / fontSize / 2 * -1) + "em";
+        })
+        .attr("dy", "2em")
+        .attr("filter", "url(#nodeTextBg)")
+        .attr("class", "nodeText");
 
       let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.125, 8]).on("zoom", zoom);
 
       _this.svg
-          .call(svgZoom)
-          .on("dblclick.zoom", null);
+        .call(svgZoom)
+        .on("dblclick.zoom", null);
 
       if (_this.lastZoomEvent !== null) {
         zoom(_this.lastZoomEvent);
+      } else {
+        _this.svg.call(svgZoom.transform, d3.zoomIdentity);
       }
 
       if (invalidation != null) invalidation.then(() => simulation.stop());
@@ -339,26 +363,26 @@ export default {
         _this.lastZoomEvent = event;
         if (event.transform.k >= 1) {
           g.selectAll("circle")
-              .attr("r", nodeRadius / event.transform.k)
-              .attr("stroke-width", nodeStrokeWidth / event.transform.k);
+            .attr("r", nodeRadius / event.transform.k)
+            .attr("stroke-width", nodeStrokeWidth / event.transform.k);
           g.selectAll("path")
-              .attr("stroke-width", linkStrokeWidth / event.transform.k);
+            .attr("stroke-width", linkStrokeWidth / event.transform.k);
           g.selectAll(".nodeText")
-              .attr("font-size", fontSize / event.transform.k);
+            .attr("font-size", fontSize / event.transform.k);
           g.selectAll(".linkText")
-              .attr("font-size", fontSize / event.transform.k);
+            .attr("font-size", fontSize / event.transform.k);
         }
       }
 
       function ticked() {
         link
-            .attr("d", function (d) {
-              if (d.source.x < d.target.x) {
-                return "M " + d.source.x + " " + d.source.y + " L " + d.target.x + " " + d.target.y;
-              } else {
-                return "M " + d.target.x + " " + d.target.y + " L " + d.source.x + " " + d.source.y;
-              }
-            });
+          .attr("d", function (d) {
+            if (d.source.x < d.target.x) {
+              return "M " + d.source.x + " " + d.source.y + " L " + d.target.x + " " + d.target.y;
+            } else {
+              return "M " + d.target.x + " " + d.target.y + " L " + d.source.x + " " + d.source.y;
+            }
+          });
 
         // link.filter(d => d.type !== "series")
         //   .attr("marker-end", function (d) {
@@ -377,12 +401,12 @@ export default {
         //   });
 
         node
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y);
+          .attr("cx", d => d.x)
+          .attr("cy", d => d.y);
 
         nodeText
-            .attr("x", d => d.x)
-            .attr("y", d => d.y);
+          .attr("x", d => d.x)
+          .attr("y", d => d.y);
       }
 
       function drag(simulation) {
@@ -404,9 +428,13 @@ export default {
         }
 
         return d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended);
+          .on("start", function (event) {
+            _this.currentNodeInfoVisible = false;
+            _this.currentNode = null;
+            dragstarted(event);
+          })
+          .on("drag", dragged)
+          .on("end", dragended);
       }
 
       function handleNodeMouseover(event, d) {
@@ -418,9 +446,9 @@ export default {
             relatedNodes.push(l.source.id);
             relatedNodes.push(l.target.id);
             d3.select("#link-" + l.id)
-                .attr("stroke", "#096dd9");
+              .attr("stroke", "#096dd9");
             d3.select("#linkText-" + l.id)
-                .attr("display", "unset");
+              .attr("display", "unset");
           }
         }
         relatedNodes = Array.from(new Set(relatedNodes));
@@ -428,10 +456,8 @@ export default {
           let n = node._groups[0][i].__data__;
           if (relatedNodes.indexOf(n.id) !== -1) {
             d3.select("#node-" + n.id)
-                .attr("stroke-width", _this.lastZoomEvent === null ?
-                    (nodeStrokeWidth + 1) :
-                    ((nodeStrokeWidth + 1) / Math.max(1, _this.lastZoomEvent.transform.k)))
-                .attr("stroke", "#096dd9");
+              .attr("stroke-width", (nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k)))
+              .attr("stroke", "#096dd9");
           }
         }
       }
@@ -445,9 +471,9 @@ export default {
             relatedNodes.push(l.source.id);
             relatedNodes.push(l.target.id);
             d3.select("#link-" + l.id)
-                .attr("stroke", linkStroke);
+              .attr("stroke", linkStroke);
             d3.select("#linkText-" + l.id)
-                .attr("display", "none");
+              .attr("display", "none");
           }
         }
         relatedNodes = Array.from(new Set(relatedNodes));
@@ -455,10 +481,8 @@ export default {
           let n = node._groups[0][i].__data__;
           if (relatedNodes.indexOf(n.id) !== -1) {
             d3.select("#node-" + n.id)
-                .attr("stroke-width", _this.lastZoomEvent === null ?
-                    nodeStrokeWidth :
-                    (nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k)))
-                .attr("stroke", nodeStroke);
+              .attr("stroke-width", nodeStrokeWidth / Math.max(1, _this.lastZoomEvent.transform.k))
+              .attr("stroke", nodeStroke);
           }
         }
       }
@@ -655,8 +679,10 @@ export default {
 </script>
 
 <style>
-.kg-wrapper {
+#kg-wrapper {
   position: relative;
+  margin: 0;
+  padding: 0;
 }
 
 #kg-link-brief-introduction {
