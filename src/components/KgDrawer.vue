@@ -4,7 +4,7 @@
     <div :class="mainClass" :style="mainStyle" class="main">
       <div class="drawer-head">
         <span>{{ title }}</span>
-        <span class="close-btn" v-show="closable" @click="closeByButton">X</span>
+        <span v-show="closable" class="close-btn" @click="closeByButton">X</span>
       </div>
       <div class="drawer-body">
         <slot/>
@@ -74,22 +74,25 @@ export default {
       };
     }
   },
-  mounted () {
+  mounted() {
     if (this.inner) {
       let box = this.$el.parentNode;
       box.style.position = "relative";
     }
   },
   methods: {
-    closeByMask () {
+    closeByMask() {
       this.maskClosable && this.$emit("update:display", false);
     },
-    closeByButton () {
+    closeByButton() {
       this.$emit("update:display", false);
     }
   }
 };
 </script>
+
+<style scoped>
+</style>
 
 <style lang="scss" scoped>
 .drawer {
@@ -101,33 +104,42 @@ export default {
     width: 100%;
     height: 100%;
     z-index: 10;
-    background-color: rgba(0,0,0,.5);
-    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.3);
     transition: opacity .5s;
+    cursor: pointer;
   }
+
   .mask-hide {
     opacity: 0;
     transition: opacity .5s;
   }
+
   /* 滑块 */
   .main {
+    border-radius: 10px 0 0 10px;
     position: fixed;
     z-index: 10;
-    top: 0;
-    height: 100%;
-    background: #fff;
+    bottom: 25px;
+    height: 85vh;
+    backdrop-filter: saturate(100%) blur(10px);
+    background: rgba(250, 250, 250, 0.8);
+    box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
     transition: all 0.5s;
   }
+
   .main-show {
     opacity: 1;
   }
+
   .main-hide {
     opacity: 0;
   }
+
   /* 某个元素内部显示 */
   .inner {
     position: absolute;
   }
+
   /* 其他样式 */
   .drawer-head {
     display: flex;
@@ -135,9 +147,10 @@ export default {
     height: 45px;
     line-height: 45px;
     padding: 0 15px;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     border-bottom: 1px solid #eee;
+
     .close-btn {
       display: inline-block;
       cursor: pointer;
@@ -145,9 +158,27 @@ export default {
       padding-left: 20px;
     }
   }
+
   .drawer-body {
-    font-size: 14px;
     padding: 15px;
+    overflow-y: auto;
+    height: 90%;
+  }
+
+  .drawer-body::-webkit-scrollbar {
+    width: 10px;
+    height: 1px;
+  }
+
+  .drawer-body::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    box-shadow: inset 0 0 3px rgba(100, 100, 100, 0.2);
+    background: #fb7299;
+  }
+
+  .drawer-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
   }
 }
 </style>

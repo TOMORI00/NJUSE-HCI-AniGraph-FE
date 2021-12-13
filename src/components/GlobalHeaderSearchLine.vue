@@ -1,7 +1,7 @@
 <template>
   <div id="global-header-search-line-body">
     <div id="global-header-search-line-main">
-      <input id="global-header-search-line-input" v-model="inputContent" placeholder="搜索" @mouseenter="isHover=true" @mouseleave="isHover=false" :style="{ color:(isHover ? 'black' : ''), background: (isHover ? 'white' : ''), fontWeight: (isHover ? 'bold' : ''), borderBottom: (isHover ? '1px solid black' : '')}">
+      <input id="global-header-search-line-input" v-model="inputContent" :placeholder=placeholder @mouseenter="isHover=true" @mouseleave="isHover=false" :style="{ color:(isHover ? 'black' : ''), background: (isHover ? 'white' : ''), fontWeight: (isHover ? 'bold' : ''), borderBottom: (isHover ? '1px solid black' : '')}">
       <button id="global-header-search-line-button" @click="inputConfirm" @mouseenter="isHover=true" @mouseleave="isHover=false" :style="{ color:(isHover ? 'black' : ''), background: (isHover ? 'white' : ''), fontWeight: (isHover ? 'bold' : ''), borderBottom: (isHover ? '1px solid black' : '')}">
         <svg height="20" style="margin-top: 4px;" version="1.1"
              viewBox="0 0 1024 1024" width="20" xmlns="http://www.w3.org/2000/svg">
@@ -23,6 +23,7 @@ export default {
     return {
       inputContent: "",
       isHover: false,
+      placeholder: "搜索",
     };
   },
   mounted() {
@@ -41,8 +42,12 @@ export default {
   },
   methods: {
     inputConfirm() {
-      this.$router.push({ path: "/candidate", query: { q: this.inputContent } });
-      location.reload();
+      if (this.inputContent === "") {
+        this.placeholder = "请输入点什么";
+      } else {
+        this.$router.push({ path: "/candidate", query: { q: this.inputContent } });
+        location.reload();
+      }
     }
   },
 };

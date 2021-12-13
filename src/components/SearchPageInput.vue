@@ -135,7 +135,7 @@ export default {
     },
     handleForecastConfirm(val) {
       this.inputContent = val;
-      this.searchPageInputConfirm();
+      this.searchInputConfirm();
     }
   },
   watch: {

@@ -1,9 +1,11 @@
 <template>
   <div class="nav">
-    <div @click="toHomePage" class="nav-button">Avatar</div>
+<!--    <div @click="toHomePage" class="nav-button">Avatar</div>-->
 <!--    <div @click="toSearchPage" v-show="currentPage !== 'SearchPage'" class="nav-button">搜索</div>-->
-    <div @click="toHomePage" class="nav-button">个人中心</div>
-    <div @click="toArchive" class="nav-button">每日放送</div>
+<!--    <div @click="toHomePage" class="nav-button">个人中心</div>-->
+<!--    <div></div>-->
+<!--    <div></div>-->
+<!--    <div @click="toArchive" class="nav-button">每日放送</div>-->
   </div>
 </template>
 
