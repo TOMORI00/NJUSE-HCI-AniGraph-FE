@@ -2,6 +2,12 @@
   <div class="kg-wrapper">
     <kg-link-brief-introduction id="kg-link-brief-introduction" v-if="currentLinkInfoVisible" :link="currentLink"/>
     <kg-node-brief-introduction id="kg-node-brief-introduction" v-if="currentNodeInfoVisible" :node="currentNode"/>
+    <button class="btn open" @click="display = true">点我，打开抽屉</button>
+    <KgDrawer title="Hello, I'm drawer" :display.sync="display" :width="drawerWidth">
+      <p>1. Hello, world!</p>
+      <p>2. Do you like it?</p>
+      <button class="btn try" @click="this.drawerWidth = (this.drawerWidth === '500px') ? '800px' : '500px'">点我试试?</button>
+    </KgDrawer>
   </div>
 </template>
 
@@ -11,15 +17,20 @@ import * as d3 from "d3";
 import {getRelationsByEntityIdAPI} from "../api/relations";
 import KgLinkBriefIntroduction from "./KgLinkBriefIntroduction";
 import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
+import KgDrawer from "@/components/KgDrawer";
 
 export default {
   name: "KnowledgeGraph",
   components: {
+    KgDrawer,
     KgLinkBriefIntroduction,
     KgNodeBriefIntroduction
   },
   data() {
     return {
+      display: false,
+      drawerWidth: "500px",
+
       nodes: null,
       links: null,
       series: [],
