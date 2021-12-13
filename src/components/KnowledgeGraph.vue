@@ -1,5 +1,14 @@
 <template>
   <div id="kg-wrapper" @contextmenu.prevent="">
+  <div class="kg-wrapper">
+    <kg-link-brief-introduction id="kg-link-brief-introduction" v-if="currentLinkInfoVisible" :link="currentLink"/>
+    <kg-node-brief-introduction id="kg-node-brief-introduction" v-if="currentNodeInfoVisible" :node="currentNode"/>
+    <button class="btn open" @click="display = true">点我，打开抽屉</button>
+    <KgDrawer title="Hello, I'm drawer" :display.sync="display" :width="drawerWidth">
+      <p>1. Hello, world!</p>
+      <p>2. Do you like it?</p>
+      <button class="btn try" @click="this.drawerWidth = (this.drawerWidth === '500px') ? '800px' : '500px'">点我试试?</button>
+    </KgDrawer>
   </div>
 </template>
 
@@ -9,15 +18,20 @@ import * as d3 from "d3";
 import {getRelationsByEntityIdAPI} from "../api/relations";
 import KgLinkBriefIntroduction from "./KgLinkBriefIntroduction";
 import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
+import KgDrawer from "@/components/KgDrawer";
 
 export default {
   name: "KnowledgeGraph",
   components: {
-    // KgLinkBriefIntroduction,
-    // KgNodeBriefIntroduction
+    KgDrawer,
+    KgLinkBriefIntroduction,
+    KgNodeBriefIntroduction
   },
   data() {
     return {
+      display: false,
+      drawerWidth: "500px",
+
       nodes: null,
       links: null,
       series: [],
@@ -323,9 +337,9 @@ export default {
 
       let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.125, 8]).on("zoom", zoom);
 
-      // _this.svg
-      //   .call(svgZoom)
-      //   .on("dblclick.zoom", null);
+      _this.svg
+        .call(svgZoom)
+        .on("dblclick.zoom", null);
 
       if (_this.lastZoomEvent !== null) {
         zoom(_this.lastZoomEvent);
@@ -664,11 +678,21 @@ export default {
 
 #kg-link-brief-introduction {
   position: absolute;
-  background: aliceblue;
+  backdrop-filter: saturate(100%) blur(30px);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
 }
 
 #kg-node-brief-introduction {
   position: absolute;
-  background: aliceblue;
+  backdrop-filter: saturate(100%) blur(10px);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  border-radius: 5px;
+  padding: 5px;
+  display: flex;
 }
 </style>
