@@ -4,10 +4,11 @@
          :src="getImageSrc(node.image)"
          alt="图片加载失败">
     <div id="kg-node-introduction-info">
-        <div id="kg-node-introduction-info-name-cn">{{ node.name_cn }}</div>
-        <div id="kg-node-introduction-info-name">{{ node.name }}</div>
-        <div></div>
-        <div id="kg-node-introduction-info-tip">右击节点查看更多信息</div>
+      <div id="kg-node-introduction-info-name-cn">{{ node.name_cn }}</div>
+      <div id="kg-node-introduction-info-name">{{ node.name }}</div>
+      <div></div>
+      <div id="kg-node-introduction-info-tip2">双击节点扩展图谱</div>
+      <div id="kg-node-introduction-info-tip1">右击节点查看更多信息</div>
     </div>
   </div>
 </template>

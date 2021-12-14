@@ -368,7 +368,9 @@ export default {
       function zoom(event) {
         g.attr("transform", event.transform);
         _this.lastZoomEvent = event;
-        _this.$refs.KgScaleDisplay.setScale(event.transform.k);
+        if(event.sourceEvent !== null) {
+          _this.$refs.KgScaleDisplay.setScale(event.transform.k);
+        }
         if (event.transform.k >= 1) {
           g.selectAll("circle")
             .attr("r", nodeRadius / event.transform.k)
@@ -379,6 +381,16 @@ export default {
             .attr("font-size", fontSize / event.transform.k);
           g.selectAll(".linkText")
             .attr("font-size", fontSize / event.transform.k);
+        }else{
+          g.selectAll("circle")
+            .attr("r", nodeRadius)
+            .attr("stroke-width", nodeStrokeWidth);
+          g.selectAll("path")
+            .attr("stroke-width", linkStrokeWidth);
+          g.selectAll(".nodeText")
+            .attr("font-size", fontSize);
+          g.selectAll(".linkText")
+            .attr("font-size", fontSize);
         }
       }
 
