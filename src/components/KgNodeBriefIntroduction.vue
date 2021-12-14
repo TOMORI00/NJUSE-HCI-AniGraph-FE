@@ -7,7 +7,7 @@
         <div id="kg-node-introduction-info-name-cn">{{ node.name_cn }}</div>
         <div id="kg-node-introduction-info-name">{{ node.name }}</div>
         <div></div>
-        <div id="kg-node-introduction-info-tip">右击节点以查看更多信息</div>
+        <div id="kg-node-introduction-info-tip">右击节点查看更多信息</div>
     </div>
   </div>
 </template>
@@ -39,8 +39,8 @@ export default {
 }
 
 #kg-node-introduction-img {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   margin-right: 5px;
   object-fit: cover;
   object-position: top left;

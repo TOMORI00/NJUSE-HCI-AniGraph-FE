@@ -5,7 +5,7 @@
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
       <KgDrawerContent :data="drawerData"></KgDrawerContent>
     </KgDrawer>
-    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display"/>
+    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"/>
   </div>
 </template>
 
@@ -41,12 +41,12 @@ export default {
 
       nodes: null,
       links: null,
-      series: [],
       //
       w: null,
       h: null,
       svg: null,
       g: null,
+      svgZoom: null,
       //
       nodeRadius: 13,
       //
@@ -298,20 +298,14 @@ export default {
           _this.drawerData = d;
         })
         .on("click", function (event, d) {
-          // let transformK = _this.lastZoomEvent.transform.k;
-          // let transformX = _this.lastZoomEvent.transform.x;
-          // let transformY = _this.lastZoomEvent.transform.y;
-          // let k = 1.5;
-          // _this.svg.call(svgZoom.transform, d3.zoomIdentity
-          //   .scale(k)
-          //   .translate(((k / transformK) * (transformX - width * 0.5) + width * 0.5) / k, ((k / transformK) * (transformY - height * 0.5) + height * 0.5) / k)
-          // );
+          // _this.handleScaleChange(1.5);
 
           // wCenter = wCenter + _this.w / 2 - d.x;
           // hCenter = hCenter + _this.h / 2 - d.y;
           // simulation.force("center", d3.forceCenter(wCenter, hCenter));
           // simulation.restart();
-          _this.svg.call(svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - d.x, _this.h / 2 - d.y));
+
+          // _this.svg.call(svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - d.x, _this.h / 2 - d.y));
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -339,18 +333,18 @@ export default {
         .attr("startOffset", "50%")
         .text(d => d.name);
 
-      let svgZoom = d3.zoom()
+      _this.svgZoom = d3.zoom()
         .extent([[window.screen.width * -1.5, window.screen.height * -1.5], [window.screen.width * 1.5, window.screen.height * 1.5]])
         .scaleExtent([0.125, 8]).on("zoom", zoom);
 
       _this.svg
-        .call(svgZoom)
+        .call(_this.svgZoom)
         .on("dblclick.zoom", null);
 
       if (_this.lastZoomEvent !== null) {
         zoom(_this.lastZoomEvent);
       } else {
-        _this.svg.call(svgZoom.transform, d3.zoomIdentity);
+        _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity);
       }
 
       if (invalidation != null) invalidation.then(() => simulation.stop());
@@ -694,6 +688,17 @@ export default {
           _this.currentLNode = null;
         }
       };
+    },
+
+    handleScaleChange(k) {
+      const _this = this;
+      let transformK = _this.lastZoomEvent.transform.k;
+      let transformX = _this.lastZoomEvent.transform.x;
+      let transformY = _this.lastZoomEvent.transform.y;
+      _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity
+        .scale(k)
+        .translate(((k / transformK) * (transformX - _this.w * 0.5) + _this.w * 0.5) / k, ((k / transformK) * (transformY - _this.h * 0.5) + _this.h * 0.5) / k)
+      );
     },
   }
 };
