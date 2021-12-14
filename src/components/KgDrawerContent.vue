@@ -50,9 +50,9 @@ export default {
 
 #kg-drawer-content-img {
   object-fit: contain;
-  width: 200px;
-  height: 200px;
-  margin-left: 135px;
+  width: 300px;
+  height: 300px;
+  margin: auto;
   border-radius: 5px;
 }
 
@@ -92,8 +92,7 @@ export default {
   height: 30px;
   background: #fb7299;
   border-radius: 5px;
-  margin-left: 180px;
-  margin-top: 20px;
+  margin: 20px auto auto;
   padding-left: 15px;
   padding-top: 5px;
   color: white;

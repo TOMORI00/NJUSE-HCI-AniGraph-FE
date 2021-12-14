@@ -119,7 +119,7 @@ export default {
     border-radius: 10px 0 0 10px;
     position: fixed;
     z-index: 10;
-    bottom: 25px;
+    bottom: 7vh;
     height: 85vh;
     backdrop-filter: saturate(100%) blur(10px);
     background: rgba(250, 250, 250, 0.8);
@@ -166,14 +166,14 @@ export default {
   }
 
   .drawer-body::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
     height: 1px;
   }
 
   .drawer-body::-webkit-scrollbar-thumb {
-    border-radius: 5px;
+    border-radius: 4px;
     box-shadow: inset 0 0 3px rgba(100, 100, 100, 0.2);
-    background: #fb7299;
+    background: rgba(251, 114, 153, 0.9);
   }
 
   .drawer-body::-webkit-scrollbar-track {

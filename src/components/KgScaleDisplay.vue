@@ -1,10 +1,24 @@
 <template>
-<div>KG Scale Display 知识图谱比例显示</div>
+<div>Scale: {{scale}}</div>
 </template>
 
 <script>
 export default {
-  name: "KgScaleDisplay"
+  name: "KgScaleDisplay",
+  data(){
+    return{
+      scale: 1,
+    };
+  },
+  methods:{
+    setScale(scale){
+      this.scale = scale;
+    },
+
+    emitScaleChangeEvent(){
+      this.$emit("scale-change", this.scale);
+    },
+  },
 };
 </script>
 

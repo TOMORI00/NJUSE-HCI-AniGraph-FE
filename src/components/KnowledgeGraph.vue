@@ -5,6 +5,7 @@
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
       <KgDrawerContent :data="drawerData"></KgDrawerContent>
     </KgDrawer>
+    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display"/>
   </div>
 </template>
 
@@ -16,10 +17,12 @@ import KgLinkBriefIntroduction from "./KgLinkBriefIntroduction";
 import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
 import KgDrawer from "@/components/KgDrawer";
 import KgDrawerContent from "@/components/KgDrawerContent";
+import KgScaleDisplay from "./KgScaleDisplay";
 
 export default {
   name: "KnowledgeGraph",
   components: {
+    KgScaleDisplay,
     KgDrawerContent,
     KgDrawer,
     KgLinkBriefIntroduction,
@@ -191,6 +194,23 @@ export default {
         .attr("stroke-opacity", 0.8)
         .attr("fill", "darkgrey");
 
+      let defs = g.append("defs");
+      let circleTextFilter = defs
+        .append("filter")
+        .attr("id", "nodeTextBg")
+        .attr("x", -0.05)
+        .attr("y", -0.05)
+        .attr("width", 1.1)
+        .attr("height", 1.1);
+
+      circleTextFilter.append("feFlood")
+        .attr("flood-color", "#fff")
+        .attr("flood-opacity", "1");
+
+      circleTextFilter.append("feComposite")
+        .attr("in", "SourceGraphic")
+        .attr("operator", "over");
+
       let link = g.append("g")
         .selectAll(".link")
         .data(links)
@@ -228,6 +248,20 @@ export default {
           _this.setLinkBriefIntroductionLocation(event, d);
         })
         .attr("class", "link");
+
+      let nodeText = g.append("g")
+        .selectAll(".nodeText")
+        .data(nodes)
+        .join("text")
+        .text(d => d.name_cn)
+        .attr("id", d => "nodeText-" + d.id)
+        .attr("font-size", fontSize)
+        .attr("dx", function () {
+          return String(this.getBoundingClientRect().width / fontSize / 2 * -1) + "em";
+        })
+        .attr("dy", "2em")
+        .attr("filter", "url(#nodeTextBg)")
+        .attr("class", "nodeText");
 
       let node = g.append("g")
         .selectAll(".node")
@@ -281,11 +315,11 @@ export default {
           //   .translate(((k / transformK) * (transformX - width * 0.5) + width * 0.5) / k, ((k / transformK) * (transformY - height * 0.5) + height * 0.5) / k)
           // );
 
-          // wCenter = wCenter + width / 2 - d.x;
-          // hCenter = hCenter + height / 2 - d.y;
-          // simulation.force("center", d3.forceCenter(wCenter, hCenter));
-          // simulation.restart();
-          // _this.svg.call(svgZoom.transform, d3.zoomIdentity);
+          wCenter = wCenter + width / 2 - d.x;
+          hCenter = hCenter + height / 2 - d.y;
+          simulation.force("center", d3.forceCenter(wCenter, hCenter));
+          simulation.restart();
+          _this.svg.call(svgZoom.transform, d3.zoomIdentity);
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -295,23 +329,6 @@ export default {
       //       return nodeTitle(d);
       //     });
       // }
-
-      let defs = g.append("defs");
-      let circleTextFilter = defs
-        .append("filter")
-        .attr("id", "nodeTextBg")
-        .attr("x", -0.05)
-        .attr("y", -0.05)
-        .attr("width", 1.1)
-        .attr("height", 1.1);
-
-      circleTextFilter.append("feFlood")
-        .attr("flood-color", "#fff")
-        .attr("flood-opacity", "1");
-
-      circleTextFilter.append("feComposite")
-        .attr("in", "SourceGraphic")
-        .attr("operator", "over");
 
       let linkText = g.append("g")
         .selectAll(".linkText")
@@ -330,20 +347,6 @@ export default {
         .attr("startOffset", "50%")
         .text(d => d.name);
 
-      let nodeText = g.append("g")
-        .selectAll(".nodeText")
-        .data(nodes)
-        .join("text")
-        .text(d => d.name_cn)
-        .attr("id", d => "nodeText-" + d.id)
-        .attr("font-size", fontSize)
-        .attr("dx", function () {
-          return String(this.getBoundingClientRect().width / fontSize / 2 * -1) + "em";
-        })
-        .attr("dy", "2em")
-        .attr("filter", "url(#nodeTextBg)")
-        .attr("class", "nodeText");
-
       let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.125, 8]).on("zoom", zoom);
 
       _this.svg
@@ -361,6 +364,7 @@ export default {
       function zoom(event) {
         g.attr("transform", event.transform);
         _this.lastZoomEvent = event;
+        _this.$refs.KgScaleDisplay.setScale(event.transform.k);
         if (event.transform.k >= 1) {
           g.selectAll("circle")
             .attr("r", nodeRadius / event.transform.k)
@@ -499,7 +503,7 @@ export default {
           // return "rgb(250, 114, 125)";
           return "#ff7875";
         case "2":
-          return "rgb(45, 183, 245)";
+          return "#40a9ff";
         case "3":
           return "rgb(112, 212, 69)";
         case "4":
@@ -628,8 +632,8 @@ export default {
       const _this = this;
       if (_this.currentLinkInfoVisible) {
         let linkBriefIntroduction = document.getElementById("kg-link-brief-introduction");
-        linkBriefIntroduction.style.top = String(event.offsetY - linkBriefIntroduction.offsetHeight) + "px";
-        linkBriefIntroduction.style.left = String(event.offsetX) + "px";
+        linkBriefIntroduction.style.top = String(event.offsetY - linkBriefIntroduction.offsetHeight - 5) + "px";
+        linkBriefIntroduction.style.left = String(event.offsetX + 5) + "px";
       }
     },
 
@@ -659,8 +663,8 @@ export default {
       const _this = this;
       if (_this.currentNodeInfoVisible) {
         let nodeBriefIntroduction = document.getElementById("kg-node-brief-introduction");
-        nodeBriefIntroduction.style.top = String(event.offsetY - nodeBriefIntroduction.offsetHeight - 6) + "px";
-        nodeBriefIntroduction.style.left = String(event.offsetX + 6) + "px";
+        nodeBriefIntroduction.style.top = String(event.offsetY - nodeBriefIntroduction.offsetHeight - 5) + "px";
+        nodeBriefIntroduction.style.left = String(event.offsetX + 5) + "px";
       }
     },
 
@@ -703,5 +707,9 @@ export default {
   border-radius: 5px;
   padding: 5px;
   display: flex;
+}
+
+#kg-scale-display{
+  position: absolute;
 }
 </style>
