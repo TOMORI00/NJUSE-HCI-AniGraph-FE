@@ -5,14 +5,14 @@
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
       <KgDrawerContent :data="drawerData"></KgDrawerContent>
     </KgDrawer>
-    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display"/>
+    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"/>
   </div>
 </template>
 
 <script>
 /* eslint-disable no-unused-vars */
 import * as d3 from "d3";
-import { getRelationsByEntityIdAPI } from "../api/relations";
+import {getRelationsByEntityIdAPI} from "../api/relations";
 import KgLinkBriefIntroduction from "./KgLinkBriefIntroduction";
 import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
 import KgDrawer from "@/components/KgDrawer";
@@ -41,12 +41,12 @@ export default {
 
       nodes: null,
       links: null,
-      series: [],
       //
       w: null,
       h: null,
       svg: null,
       g: null,
+      svgZoom: null,
       //
       nodeRadius: 13,
       //
@@ -69,7 +69,6 @@ export default {
     this.links = res.data.content.Relations;
     this.w = document.body.clientWidth;
     this.h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
-    let headerHeight = Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
 
     let kgWrapper = document.getElementById("kg-wrapper");
     kgWrapper.style.height = this.h + "px";
@@ -79,13 +78,6 @@ export default {
       .attr("id", "kgSvg")
       .attr("viewBox", [0, 0, Math.max(this.w, 800), this.h]);
     this.initPage();
-    window.onresize = function () {
-      let w = document.documentElement.clientWidth;
-      let h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
-      this.w = w;
-      this.h = h;
-      d3.select("#kgSvg").attr("viewBox", [0, 0, Math.max(w, 800), h]);
-    };
   },
   methods: {
     initPage() {
@@ -108,7 +100,7 @@ export default {
       });
     },
 
-    initGraph({ nodes, links },
+    initGraph({nodes, links},
               {
                 nodeTitle,
                 nodeFill,
@@ -306,20 +298,14 @@ export default {
           _this.drawerData = d;
         })
         .on("click", function (event, d) {
-          // let transformK = _this.lastZoomEvent.transform.k;
-          // let transformX = _this.lastZoomEvent.transform.x;
-          // let transformY = _this.lastZoomEvent.transform.y;
-          // let k = 1.5;
-          // _this.svg.call(svgZoom.transform, d3.zoomIdentity
-          //   .scale(k)
-          //   .translate(((k / transformK) * (transformX - width * 0.5) + width * 0.5) / k, ((k / transformK) * (transformY - height * 0.5) + height * 0.5) / k)
-          // );
+          // _this.handleScaleChange(1.5);
 
-          wCenter = wCenter + width / 2 - d.x;
-          hCenter = hCenter + height / 2 - d.y;
-          simulation.force("center", d3.forceCenter(wCenter, hCenter));
-          simulation.restart();
-          _this.svg.call(svgZoom.transform, d3.zoomIdentity);
+          // wCenter = wCenter + _this.w / 2 - d.x;
+          // hCenter = hCenter + _this.h / 2 - d.y;
+          // simulation.force("center", d3.forceCenter(wCenter, hCenter));
+          // simulation.restart();
+
+          // _this.svg.call(svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - d.x, _this.h / 2 - d.y));
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -347,19 +333,34 @@ export default {
         .attr("startOffset", "50%")
         .text(d => d.name);
 
-      let svgZoom = d3.zoom().extent([[0, 0], [width, height]]).scaleExtent([0.125, 8]).on("zoom", zoom);
+      _this.svgZoom = d3.zoom()
+        .extent([[window.screen.width * -1.5, window.screen.height * -1.5], [window.screen.width * 1.5, window.screen.height * 1.5]])
+        .scaleExtent([0.125, 8]).on("zoom", zoom);
 
       _this.svg
-        .call(svgZoom)
+        .call(_this.svgZoom)
         .on("dblclick.zoom", null);
 
       if (_this.lastZoomEvent !== null) {
         zoom(_this.lastZoomEvent);
       } else {
-        _this.svg.call(svgZoom.transform, d3.zoomIdentity);
+        _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity);
       }
 
       if (invalidation != null) invalidation.then(() => simulation.stop());
+
+      window.onresize = function () {
+        let w = document.documentElement.clientWidth;
+        let h = document.body.clientHeight - Math.max(32, Math.min(64, document.body.clientHeight * 0.08));
+        _this.w = w;
+        _this.h = h;
+        wCenter = w / 2;
+        hCenter = h / 2;
+        _this.svg.attr("viewBox", [0, 0, Math.max(w, 800), h]);
+        simulation.force("center", d3.forceCenter(wCenter, hCenter));
+        simulation.restart();
+        zoom(_this.lastZoomEvent);
+      };
 
       function zoom(event) {
         g.attr("transform", event.transform);
@@ -632,8 +633,13 @@ export default {
       const _this = this;
       if (_this.currentLinkInfoVisible) {
         let linkBriefIntroduction = document.getElementById("kg-link-brief-introduction");
+        let w = linkBriefIntroduction.getBoundingClientRect().width;
+        if (w + event.offsetX < this.w) {
+          linkBriefIntroduction.style.left = String(event.offsetX + 5) + "px";
+        } else {
+          linkBriefIntroduction.style.left = String(this.w - w) + "px";
+        }
         linkBriefIntroduction.style.top = String(event.offsetY - linkBriefIntroduction.offsetHeight - 5) + "px";
-        linkBriefIntroduction.style.left = String(event.offsetX + 5) + "px";
       }
     },
 
@@ -663,8 +669,13 @@ export default {
       const _this = this;
       if (_this.currentNodeInfoVisible) {
         let nodeBriefIntroduction = document.getElementById("kg-node-brief-introduction");
-        nodeBriefIntroduction.style.top = String(event.offsetY - nodeBriefIntroduction.offsetHeight - 5) + "px";
-        nodeBriefIntroduction.style.left = String(event.offsetX + 5) + "px";
+        let w = nodeBriefIntroduction.getBoundingClientRect().width;
+        if (w + event.offsetX < this.w) {
+          nodeBriefIntroduction.style.left = String(event.offsetX + 5) + "px";
+        } else {
+          nodeBriefIntroduction.style.left = String(this.w - w) + "px";
+        }
+        nodeBriefIntroduction.style.top = String(event.offsetY - nodeBriefIntroduction.offsetHeight - 10) + "px";
       }
     },
 
@@ -677,6 +688,17 @@ export default {
           _this.currentLNode = null;
         }
       };
+    },
+
+    handleScaleChange(k) {
+      const _this = this;
+      let transformK = _this.lastZoomEvent.transform.k;
+      let transformX = _this.lastZoomEvent.transform.x;
+      let transformY = _this.lastZoomEvent.transform.y;
+      _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity
+        .scale(k)
+        .translate(((k / transformK) * (transformX - _this.w * 0.5) + _this.w * 0.5) / k, ((k / transformK) * (transformY - _this.h * 0.5) + _this.h * 0.5) / k)
+      );
     },
   }
 };
@@ -709,7 +731,7 @@ export default {
   display: flex;
 }
 
-#kg-scale-display{
+#kg-scale-display {
   position: absolute;
 }
 </style>
