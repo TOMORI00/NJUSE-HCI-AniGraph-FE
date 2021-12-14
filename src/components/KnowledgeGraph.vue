@@ -3,8 +3,9 @@
     <kg-link-brief-introduction v-if="currentLinkInfoVisible" id="kg-link-brief-introduction" :link="currentLink"/>
     <kg-node-brief-introduction v-if="currentNodeInfoVisible" id="kg-node-brief-introduction" :node="currentNode"/>
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
-      <KgDrawerContent :data="drawerData"></KgDrawerContent>
+      <KgDrawerContent :data="drawerData"/>
     </KgDrawer>
+    <KgSearchLine ref="KgSearchLine" id="kg-search-line" @display-switch="handleKgSearchLineSwitch"/>
     <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"/>
   </div>
 </template>
@@ -18,10 +19,12 @@ import KgNodeBriefIntroduction from "./KgNodeBriefIntroduction";
 import KgDrawer from "@/components/KgDrawer";
 import KgDrawerContent from "@/components/KgDrawerContent";
 import KgScaleDisplay from "./KgScaleDisplay";
+import KgSearchLine from "@/components/KgSearchLine";
 
 export default {
   name: "KnowledgeGraph",
   components: {
+    KgSearchLine,
     KgScaleDisplay,
     KgDrawerContent,
     KgDrawer,
@@ -700,6 +703,14 @@ export default {
         .translate(((k / transformK) * (transformX - _this.w * 0.5) + _this.w * 0.5) / k, ((k / transformK) * (transformY - _this.h * 0.5) + _this.h * 0.5) / k)
       );
     },
+
+    handleKgSearchLineSwitch(display) {
+      if (display) {
+        document.getElementById("kg-search-line").style.right = "0px";
+      } else {
+        document.getElementById("kg-search-line").style.right = "-400px";
+      }
+    }
   }
 };
 </script>
@@ -733,5 +744,20 @@ export default {
 
 #kg-scale-display {
   position: absolute;
+}
+
+#kg-search-line {
+  position: fixed;
+  right: 0;
+  top: 100px;
+  width: 400px;
+  height: 70px;
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 10px 10px 10px rgba(220, 220, 220, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 20px;
+  transition: all 0.5s;
 }
 </style>
