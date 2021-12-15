@@ -26,12 +26,12 @@
       <div>制作人</div>
     </div>
     <div class="legend" @click="handleClick(5)" style="display: flex;margin-bottom: 5px">
-      <div style="margin-top: 10px; opacity: 0.6; width: 20px; height: 0; border: 1px dashed; margin-right: 10px; margin-bottom: 5px;"
+      <div style="margin-top: 10px; opacity: 0.6; width: 20px; height: 0; border-top: 3px dashed; margin-right: 10px; margin-bottom: 5px;"
            :style="{'border-color': series?'#ff7875':'rgba(240, 240, 240, 0.7)'}"/>
       <div>系列作品</div>
     </div>
     <div class="legend" @click="handleClick(6)" style="display: flex">
-      <div style="margin-top: 10px; opacity: 0.6; width: 20px; height: 0; border: 1px solid; margin-right: 10px;"
+      <span style="display: inline-block; margin-top: 10px; opacity: 0.6; width: 20px; height: 0; border-top: 3px solid; margin-right: 10px;"
            :style="{'border-color': link?'#999999':'rgba(240, 240, 240, 0.7)'}"/>
       <div>其他关系</div>
     </div>

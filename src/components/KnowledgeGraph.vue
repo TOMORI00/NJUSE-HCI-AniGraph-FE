@@ -861,7 +861,7 @@ export default {
   backdrop-filter: saturate(200%) blur(30px);
   background: rgba(240, 240, 240, 0.7);
   box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
-  padding: 10px 0;
+  padding: 10px 0 3px 0;
   border-radius: 5px;
 }
 
@@ -882,7 +882,7 @@ export default {
 }
 
 #kg-legend {
-  padding: 10px;
+  padding: 10px 20px 10px 10px;
   position: absolute;
   bottom: 1vh;
   right: 0;
