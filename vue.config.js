@@ -11,5 +11,6 @@ module.exports = {
             // 资源大小评估
             // new BundleAnalyzerPlugin(),
         ],
-    })
+
+    }),
 }
