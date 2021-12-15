@@ -7,6 +7,7 @@
     </KgDrawer>
     <KgSearchLine ref="KgSearchLine" id="kg-search-line" @display-switch="handleKgSearchLineSwitch"/>
     <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"/>
+    <kg-legend ref="KgLegend" id="kg-legend" @legend-change="handleLegendChange"/>
   </div>
 </template>
 
@@ -20,10 +21,12 @@ import KgDrawer from "@/components/KgDrawer";
 import KgDrawerContent from "@/components/KgDrawerContent";
 import KgScaleDisplay from "./KgScaleDisplay";
 import KgSearchLine from "@/components/KgSearchLine";
+import KgLegend from "./KgLegend";
 
 export default {
   name: "KnowledgeGraph",
   components: {
+    KgLegend,
     KgSearchLine,
     KgScaleDisplay,
     KgDrawerContent,
@@ -39,6 +42,7 @@ export default {
         image: null,
         name_cn: null,
         name: null,
+        alias: null,
         summary: null,
       },
 
@@ -301,14 +305,8 @@ export default {
           _this.drawerData = d;
         })
         .on("click", function (event, d) {
-          // _this.handleScaleChange(1.5);
-
-          // wCenter = wCenter + _this.w / 2 - d.x;
-          // hCenter = hCenter + _this.h / 2 - d.y;
-          // simulation.force("center", d3.forceCenter(wCenter, hCenter));
-          // simulation.restart();
-
-          // _this.svg.call(svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - d.x, _this.h / 2 - d.y));
+          _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - d.x, _this.h / 2 - d.y));
+          _this.$refs.KgScaleDisplay.setScale(1);
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -368,7 +366,7 @@ export default {
       function zoom(event) {
         g.attr("transform", event.transform);
         _this.lastZoomEvent = event;
-        if(event.sourceEvent !== null) {
+        if (event.sourceEvent !== null) {
           _this.$refs.KgScaleDisplay.setScale(event.transform.k);
         }
         if (event.transform.k >= 1) {
@@ -381,7 +379,7 @@ export default {
             .attr("font-size", fontSize / event.transform.k);
           g.selectAll(".linkText")
             .attr("font-size", fontSize / event.transform.k);
-        }else{
+        } else {
           g.selectAll("circle")
             .attr("r", nodeRadius)
             .attr("stroke-width", nodeStrokeWidth);
@@ -467,8 +465,11 @@ export default {
             relatedNodes.push(l.target.id);
             d3.select("#link-" + l.id)
               .attr("stroke", "#096dd9");
-            d3.select("#linkText-" + l.id)
-              .attr("display", "unset");
+            if (d3.select("#link-" + l.id)
+              .attr("display") !== "none") {
+              d3.select("#linkText-" + l.id)
+                .attr("display", "unset");
+            }
           }
         }
         relatedNodes = Array.from(new Set(relatedNodes));
@@ -492,8 +493,11 @@ export default {
             relatedNodes.push(l.target.id);
             d3.select("#link-" + l.id)
               .attr("stroke", linkStroke);
-            d3.select("#linkText-" + l.id)
-              .attr("display", "none");
+            if (d3.select("#link-" + l.id)
+              .attr("display") !== "none") {
+              d3.select("#linkText-" + l.id)
+                .attr("display", "none");
+            }
           }
         }
         relatedNodes = Array.from(new Set(relatedNodes));
@@ -722,8 +726,104 @@ export default {
       } else {
         document.getElementById("kg-search-line").style.right = "-400px";
       }
-    }
-  }
+    },
+
+    handleLegendChange({subject, character, actor, staff, series, link}) {
+      d3.selectAll(".node").attr("display", function (d) {
+        let type = String(d.id)[0];
+        switch (type) {
+          case "1":
+            if (subject) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          case "2":
+            if (character) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          case "3":
+            if (actor) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          case "4":
+            if (staff) {
+              return "unset";
+            } else {
+              return "none";
+            }
+        }
+      });
+
+      d3.selectAll(".nodeText").attr("display", function (d) {
+        let type = String(d.id)[0];
+        switch (type) {
+          case "1":
+            if (subject) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          case "2":
+            if (character) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          case "3":
+            if (actor) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          case "4":
+            if (staff) {
+              return "unset";
+            } else {
+              return "none";
+            }
+        }
+      });
+
+      d3.selectAll(".link").attr("display", function (d) {
+        if (d3.select("#node-" + d.source.id).attr("display") === "none" ||
+          d3.select("#node-" + d.target.id).attr("display") === "none") {
+          return "none";
+        }
+        switch (d.type) {
+          case "series":
+            if (series) {
+              return "unset";
+            } else {
+              return "none";
+            }
+          default:
+            if (link) {
+              return "unset";
+            } else {
+              return "none";
+            }
+        }
+      });
+    },
+  },
+  watch: {
+    drawerDisplay(newVal, oldVal) {
+      if (!newVal && oldVal) {
+        this.drawerData = {
+          image: null,
+          name_cn: null,
+          name: null,
+          alias: null,
+          summary: null,
+        };
+      }
+    },
+  },
 };
 </script>
 
@@ -756,20 +856,39 @@ export default {
 
 #kg-scale-display {
   position: absolute;
+  left: 20px;
+  top: 30vh;
+  backdrop-filter: saturate(200%) blur(30px);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  padding: 10px 0;
+  border-radius: 5px;
 }
 
 #kg-search-line {
   position: fixed;
-  right: 0;
-  top: 100px;
+  right: -400px;
+  top: 15vh;
   width: 400px;
   height: 70px;
+  backdrop-filter: saturate(200%) blur(30px);
   background: rgba(240, 240, 240, 0.7);
-  box-shadow: 10px 10px 10px rgba(220, 220, 220, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding-left: 20px;
   transition: all 0.5s;
+}
+
+#kg-legend {
+  padding: 10px;
+  position: absolute;
+  bottom: 1vh;
+  right: 0;
+  backdrop-filter: saturate(200%) blur(30px);
+  background: rgba(240, 240, 240, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  border-radius: 10px 0 0 10px;
 }
 </style>

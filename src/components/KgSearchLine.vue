@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       content: "",
-      display: true,
+      display: false,
       switchTip: "搜索",
     };
   },
@@ -66,7 +66,11 @@ export default {
     },
 
     emitSearchEvent() {
-      this.$emit("search-acknowledge");
+      this.$emit("search-acknowledge", this.content);
+    },
+
+    emitSearchCancelEvent(){
+      this.$emit("search-cancel");
     },
 
     emitNextResultEvent() {
@@ -86,8 +90,9 @@ export default {
   width: 50px;
   position: absolute;
   left: -50px;
+  /*backdrop-filter: saturate(200%) blur(30px);*/
   background: rgba(240, 240, 240, 0.7);
-  box-shadow: 10px 10px 10px rgba(220, 220, 220, 0.7);
+  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
   border-radius: 30px 0 0 30px;
 }
 

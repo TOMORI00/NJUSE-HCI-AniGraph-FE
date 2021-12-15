@@ -1,11 +1,12 @@
 <template>
   <div>
-    <div style="display: inline-block;height: 300px;margin-left: 70px">
+    <div style="display: inline-block;height: 200px;">
       <a-slider v-model="scale"
                 :default-value="30"
                 :tipFormatter="tipFormatter"
                 @change="changeScale"
                 tooltipPlacement="right"
+                :marks="marks"
                 vertical/>
     </div>
   </div>
@@ -19,6 +20,14 @@ export default {
   data() {
     return {
       scale: 50,
+      marks: {
+        // 0: "12.5%",
+        // 50: "100%",
+        // 100: "800%",
+        0: "",
+        50: "",
+        100: "",
+      },
     };
   },
   components: {
@@ -27,16 +36,16 @@ export default {
   methods: {
     tipFormatter() {
       if (this.scale >= 50) {
-        return (this.scale - 50) / 50 * 7 + 1;
+        return ((this.scale - 50) / 50 * 7 + 1).toFixed(2);
       } else {
-        return 1 / ((50 - this.scale) / 50 * 7 + 1);
+        return (1 / ((50 - this.scale) / 50 * 7 + 1)).toFixed(2);
       }
     },
 
     setScale(k) {
       if (k >= 1) {
         this.scale = (k - 1) / 7 * 50 + 50;
-      }else{
+      } else {
         this.scale = 50 - (1 / k - 1) / 7 * 50;
       }
     },

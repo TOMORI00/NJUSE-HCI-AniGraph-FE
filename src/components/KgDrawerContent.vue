@@ -8,6 +8,9 @@
       <div id="kg-drawer-content-info-name">
         {{ data.name }}
       </div>
+      <div v-if="data.alias!==''" id="kg-drawer-content-info-alias">
+        别名: {{ data.alias }}
+      </div>
       <div v-if="String(data.id)[0] === '1'">
         开播时间: {{ data.air_date }}
       </div>

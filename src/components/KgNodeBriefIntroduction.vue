@@ -7,8 +7,8 @@
       <div id="kg-node-introduction-info-name-cn">{{ node.name_cn }}</div>
       <div id="kg-node-introduction-info-name">{{ node.name }}</div>
       <div></div>
-      <div id="kg-node-introduction-info-tip2">双击节点扩展图谱</div>
-      <div id="kg-node-introduction-info-tip1">右击节点查看更多信息</div>
+      <div id="kg-node-introduction-info-tip2"><span style="color: #fb7299">双击</span>节点扩展图谱</div>
+      <div id="kg-node-introduction-info-tip1"><span style="color: #fb7299">右击</span>节点查看更多信息</div>
     </div>
   </div>
 </template>

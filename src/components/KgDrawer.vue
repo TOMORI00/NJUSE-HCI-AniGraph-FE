@@ -106,7 +106,7 @@ export default {
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.3);
     transition: opacity .5s;
-    cursor: pointer;
+    //cursor: pointer;
   }
 
   .mask-hide {
