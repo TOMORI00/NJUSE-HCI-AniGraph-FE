@@ -95,6 +95,35 @@ export default {
 </script>
 
 <style scoped>
+/deep/ .ant-slider-track {
+  background-color: rgba(251, 114, 153, 0.5);
+}
+
+/deep/ .ant-slider:hover .ant-slider-track {
+  background-color: rgba(251, 114, 153, 0.85);
+}
+
+/deep/ .ant-slider-dot-active {
+  border-color: rgba(251, 114, 153, 0.5);
+}
+
+/deep/ .ant-slider-handle {
+  border: solid 2px rgba(251, 114, 153, 0.5);
+}
+
+/deep/ .ant-slider-handle:focus {
+  border: solid 2px rgba(251, 114, 153, 0.5);
+  box-shadow: 0 0 0 5px rgba(251, 114, 153, 0.5);
+}
+
+/deep/ .ant-slider:hover .ant-slider-handle:not(.ant-tooltip-open) {
+  border-color: rgba(251, 114, 153, 0.85);
+}
+
+/deep/ .ant-slider-handle.ant-tooltip-open {
+  border-color: rgba(251, 114, 153, 0.85);
+}
+
 svg {
   cursor: pointer;
 }
