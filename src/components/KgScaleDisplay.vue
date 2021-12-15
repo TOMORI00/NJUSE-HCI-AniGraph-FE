@@ -9,7 +9,7 @@
       </svg>
     </div>
     <div style="display: inline-block;height: 200px;">
-      <a-slider v-model="scale"
+      <a-slider v-model="value"
                 :default-value="30"
                 :marks="marks"
                 :tipFormatter="tipFormatter"
@@ -34,14 +34,14 @@
 </template>
 
 <script>
-import { Slider as ASlider, } from "ant-design-vue";
+import {Slider as ASlider,} from "ant-design-vue";
 
 export default {
   name: "KgScaleDisplay",
   data() {
     return {
-      current: 1,
-      scale: 50,
+      scale: 1,
+      value: 50,
       marks: {
         0: "",
         50: "",
@@ -53,25 +53,25 @@ export default {
     ASlider,
   },
   watch: {
-    scale() {
-      if (this.scale >= 50) {
-        this.current = ((this.scale - 50) / 50 * 7 + 1);
+    value() {
+      if (this.value >= 50) {
+        this.scale = ((this.value - 50) / 50 * 7 + 1);
       } else {
-        this.current = (1 / ((50 - this.scale) / 50 * 7 + 1));
+        this.scale = (1 / ((50 - this.value) / 50 * 7 + 1));
       }
-      this.emitScaleChangeEvent(this.current);
+      this.emitScaleChangeEvent(this.scale);
     }
   },
   methods: {
     tipFormatter() {
-      return this.current.toFixed(2);
+      return this.scale.toFixed(2);
     },
 
     setScale(k) {
       if (k >= 1) {
-        this.scale = (k - 1) / 7 * 50 + 50;
+        this.value = (k - 1) / 7 * 50 + 50;
       } else {
-        this.scale = 50 - (1 / k - 1) / 7 * 50;
+        this.value = 50 - (1 / k - 1) / 7 * 50;
       }
     },
 
@@ -80,15 +80,15 @@ export default {
     },
 
     handleReset() {
-
+      this.$emit("kg-reset");
     },
 
     handleScaleUp() {
-
+      this.value = Math.min(100, this.value + 10);
     },
 
     handleScaleDown() {
-
+      this.value = Math.max(0, this.value - 10);
     },
   },
 };

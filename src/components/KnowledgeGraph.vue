@@ -12,7 +12,8 @@
                   @next-result="handleNextIndex"
                   @search-acknowledge="handleSearchAcknowledge"
                   @display-switch="handleKgSearchLineSwitch"/>
-    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"/>
+    <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"
+                      @kg-reset="handleKgReset"/>
     <kg-legend ref="KgLegend" id="kg-legend" @legend-change="handleLegendChange"/>
   </div>
 </template>
@@ -873,9 +874,17 @@ export default {
       const _this = this;
       d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#fb7299");
       let node = d3.select("#node-" + _this.filteredNodes[_this.currentIndex - 1]);
+      let k = _this.lastZoomEvent.transform.k;
       let x = node._groups[0][0].__data__.x;
       let y = node._groups[0][0].__data__.y;
-      _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - x, _this.h / 2 - y));
+      _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity.translate((_this.w / 2 - x), (_this.h / 2 - y)));
+      _this.handleScaleChange(k);
+      _this.$refs.KgScaleDisplay.setScale(k);
+    },
+
+    handleKgReset() {
+      const _this = this;
+      _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity);
       _this.$refs.KgScaleDisplay.setScale(1);
     },
   },
