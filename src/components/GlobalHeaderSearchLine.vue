@@ -29,7 +29,7 @@ export default {
   mounted() {
     const that = this;
     this.inputContent = String(this.$route.query.q);
-    document.onkeydown = function () {
+    document.getElementById("global-header-search-line-input").onkeydown = function () {
       if (that.$router.currentRoute.path === "/candidate" || that.$router.currentRoute.path === "/graph") {
         const key = window.event.keyCode;
         switch (key) {

@@ -5,7 +5,13 @@
     <KgDrawer :display.sync="drawerDisplay" :width="drawerWidth" title="节点详情">
       <KgDrawerContent :data="drawerData"/>
     </KgDrawer>
-    <KgSearchLine ref="KgSearchLine" id="kg-search-line" @display-switch="handleKgSearchLineSwitch"/>
+    <KgSearchLine ref="KgSearchLine" id="kg-search-line"
+                  :totalNum="totalNum"
+                  :currentIndex="currentIndex"
+                  @prev-result="handlePrevIndex"
+                  @next-result="handleNextIndex"
+                  @search-acknowledge="handleSearchAcknowledge"
+                  @display-switch="handleKgSearchLineSwitch"/>
     <kg-scale-display ref="KgScaleDisplay" id="kg-scale-display" @scale-change="handleScaleChange"/>
     <kg-legend ref="KgLegend" id="kg-legend" @legend-change="handleLegendChange"/>
   </div>
@@ -66,6 +72,11 @@ export default {
       nodeTimer: null,
       currentNode: null,
       currentNodeInfoVisible: false,
+      //
+      currentKeyword: null,
+      totalNum: 0,
+      currentIndex: 0,
+      filteredNodes: [],
     };
   },
   computed: {},
@@ -305,8 +316,6 @@ export default {
           _this.drawerData = d;
         })
         .on("click", function (event, d) {
-          _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - d.x, _this.h / 2 - d.y));
-          _this.$refs.KgScaleDisplay.setScale(1);
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -725,6 +734,11 @@ export default {
         document.getElementById("kg-search-line").style.right = "0px";
       } else {
         document.getElementById("kg-search-line").style.right = "-400px";
+        d3.select("#nodeText-" + this.filteredNodes[this.currentIndex - 1]).attr("fill", "#000");
+        this.$refs.KgSearchLine.setContent("");
+        this.currentKeyword = "";
+        this.totalNum = 0;
+        this.currentIndex = 0;
       }
     },
 
@@ -810,6 +824,60 @@ export default {
         }
       });
     },
+
+    handleSearchAcknowledge(content) {
+      const _this = this;
+      if (content !== _this.currentKeyword) {
+        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        _this.currentKeyword = content;
+        _this.totalNum = 0;
+        _this.filteredNodes = [];
+        let nodes = d3.selectAll(".nodeText");
+        for (let i = 0; i < nodes._groups[0].length; i++) {
+          let node = nodes._groups[0][i].__data__;
+          if (node.name_cn.indexOf(content) !== -1) {
+            _this.filteredNodes.push(node.id);
+            _this.totalNum += 1;
+          }
+        }
+        if (_this.filteredNodes.length === 0) {
+          _this.currentIndex = 0;
+        } else {
+          _this.currentIndex = 1;
+          _this.setFilteredNodeLocationByIndex();
+        }
+      } else {
+        _this.handleNextIndex();
+      }
+    },
+
+    handlePrevIndex() {
+      const _this = this;
+      if (_this.filteredNodes.length !== 0) {
+        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        _this.currentIndex = (_this.currentIndex - _this.filteredNodes.length - 1) % _this.filteredNodes.length + _this.filteredNodes.length;
+        _this.setFilteredNodeLocationByIndex();
+      }
+    },
+
+    handleNextIndex() {
+      const _this = this;
+      if (_this.filteredNodes.length !== 0) {
+        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        _this.currentIndex = _this.currentIndex % _this.filteredNodes.length + 1;
+        _this.setFilteredNodeLocationByIndex();
+      }
+    },
+
+    setFilteredNodeLocationByIndex() {
+      const _this = this;
+      d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#fb7299");
+      let node = d3.select("#node-" + _this.filteredNodes[_this.currentIndex - 1]);
+      let x = node._groups[0][0].__data__.x;
+      let y = node._groups[0][0].__data__.y;
+      _this.svg.call(_this.svgZoom.transform, d3.zoomIdentity.translate(_this.w / 2 - x, _this.h / 2 - y));
+      _this.$refs.KgScaleDisplay.setScale(1);
+    },
   },
   watch: {
     drawerDisplay(newVal, oldVal) {
@@ -883,12 +951,12 @@ export default {
 
 #kg-legend {
   padding: 10px;
-  position: absolute;
-  bottom: 1vh;
+  position: fixed;
+  bottom: 0;
   right: 0;
   backdrop-filter: saturate(200%) blur(30px);
   background: rgba(240, 240, 240, 0.7);
   box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px 0 0 0;
 }
 </style>

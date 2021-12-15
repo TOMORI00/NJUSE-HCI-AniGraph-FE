@@ -22,7 +22,7 @@
     <div
       style="width: 60%; outline: solid 1px gray; height: 0;margin-top: 1px;margin-bottom: 6px; margin-left: 20%; display: inline-block"></div>
     <div id="kg-search-line-main">
-      <input id="kg-search-line-input">
+      <input id="kg-search-line-input" v-model="content" @keydown.enter="emitSearchEvent">
       <div id="kg-search-line-result">
         <div id="kg-search-line-result-last" @click="emitPrevResultEvent">
           <svg height="16" version="1.1" viewBox="0 0 1024 1024" width="16" xmlns="http://www.w3.org/2000/svg">
@@ -38,7 +38,7 @@
               fill="#707070"></path>
           </svg>
         </div>
-        <div id="kg-search-line-result-tip">第x个结果，共xx个</div>
+        <div id="kg-search-line-result-tip">第{{ currentIndex }}个结果，共{{ totalNum }}个</div>
       </div>
     </div>
   </div>
@@ -54,6 +54,10 @@ export default {
       switchTip: "搜索",
     };
   },
+  props: {
+    totalNum: Number,
+    currentIndex: Number,
+  },
   methods: {
     handleSwitchClick() {
       this.display = !this.display;
@@ -66,10 +70,12 @@ export default {
     },
 
     emitSearchEvent() {
-      this.$emit("search-acknowledge", this.content);
+      if (this.content !== "") {
+        this.$emit("search-acknowledge", this.content);
+      }
     },
 
-    emitSearchCancelEvent(){
+    emitSearchCancelEvent() {
       this.$emit("search-cancel");
     },
 
@@ -80,11 +86,18 @@ export default {
     emitPrevResultEvent() {
       this.$emit("prev-result");
     },
+
+    setContent(content){
+      this.content = content;
+    }
   }
 };
 </script>
 
 <style scoped>
+#kg-search-line-body {
+}
+
 #kg-search-line-switch {
   height: 70px;
   width: 50px;
@@ -103,6 +116,7 @@ export default {
 #kg-search-line-tip {
   font-weight: bold;
   text-align: center;
+  user-select: none;
 }
 
 #kg-search-line-main {
@@ -124,11 +138,17 @@ export default {
 #kg-search-line-result-last {
   padding-top: 5px;
   margin-left: 10px;
+  cursor: pointer;
 }
 
 #kg-search-line-result-next {
   padding-top: 5px;
   margin-left: 10px;
   margin-right: 10px;
+  cursor: pointer;
+}
+
+#kg-search-line-result-tip {
+  user-select: none;
 }
 </style>
