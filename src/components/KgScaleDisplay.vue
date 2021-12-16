@@ -135,7 +135,7 @@ svg {
   background: #fb7299;
   bottom: -40px;
   background: rgba(240, 240, 240, 0.7);
-  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  box-shadow: 0 3px 5px rgba(220, 220, 220, 0.7);
   border-radius: 10px;
   padding-top: 7px;
   padding-left: 5px;

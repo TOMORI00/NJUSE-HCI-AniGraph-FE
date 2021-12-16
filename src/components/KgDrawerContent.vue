@@ -19,9 +19,21 @@
       </div>
       <div id="kg-drawer-content-info-summary">{{ data.summary }}
       </div>
-      <a id="kg-drawer-content-info-button" :href="data.url" target="_blank">
-        <span>前往 Bangumi</span>
-      </a>
+      <div style="display: flex;flex-direction: row">
+        <a id="kg-drawer-content-info-button-1" :href="data.url" target="_blank">
+          <span>前往 Bangumi</span>
+        </a>
+
+        <a id="kg-drawer-content-info-button-2" :href="'https://search.bilibili.com/all?keyword='+data.name_cn"
+           target="_blank">
+          <span>前往 B站</span>
+        </a>
+
+        <a id="kg-drawer-content-info-button-3" :href="'https://www.acfun.cn/search?keyword='+data.name_cn"
+           target="_blank">
+          <span>前往 A站</span>
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -88,7 +100,7 @@ export default {
   white-space: pre-wrap;
 }
 
-#kg-drawer-content-info-button {
+#kg-drawer-content-info-button-1 {
   outline: none;
   border: none;
   width: 120px;
@@ -101,7 +113,43 @@ export default {
   color: white;
 }
 
-#kg-drawer-content-info-button:hover {
+#kg-drawer-content-info-button-1:hover {
+  background: #e8658b;
+  cursor: pointer;
+}
+
+#kg-drawer-content-info-button-2 {
+  outline: none;
+  border: none;
+  width: 86px;
+  height: 30px;
+  background: #fb7299;
+  border-radius: 5px;
+  margin: 20px auto auto;
+  padding-left: 15px;
+  padding-top: 5px;
+  color: white;
+}
+
+#kg-drawer-content-info-button-2:hover {
+  background: #e8658b;
+  cursor: pointer;
+}
+
+#kg-drawer-content-info-button-3 {
+  outline: none;
+  border: none;
+  width: 86px;
+  height: 30px;
+  background: #fb7299;
+  border-radius: 5px;
+  margin: 20px auto auto;
+  padding-left: 15px;
+  padding-top: 5px;
+  color: white;
+}
+
+#kg-drawer-content-info-button-3:hover {
   background: #e8658b;
   cursor: pointer;
 }

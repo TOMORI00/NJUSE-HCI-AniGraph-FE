@@ -64,7 +64,7 @@ export default {
 #global-header-search-line-input {
   border: none;
   height: 32px;
-  width: 300px;
+  width: 30vw;
   padding-left: 10px;
   padding-right: 40px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.4);

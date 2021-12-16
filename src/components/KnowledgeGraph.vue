@@ -206,19 +206,51 @@ export default {
         .attr("fill", "darkgrey");
 
       let defs = g.append("defs");
-      let circleTextFilter = defs
+      let circleTextFilter1 = defs
         .append("filter")
-        .attr("id", "nodeTextBg")
+        .attr("id", "nodeTextBg1")
         .attr("x", -0.05)
         .attr("y", -0.05)
         .attr("width", 1.1)
         .attr("height", 1.1);
 
-      circleTextFilter.append("feFlood")
+      circleTextFilter1.append("feFlood")
         .attr("flood-color", "#fff")
         .attr("flood-opacity", "1");
 
-      circleTextFilter.append("feComposite")
+      circleTextFilter1.append("feComposite")
+        .attr("in", "SourceGraphic")
+        .attr("operator", "over");
+
+      let circleTextFilter2 = defs
+        .append("filter")
+        .attr("id", "nodeTextBg2")
+        .attr("x", -0.05)
+        .attr("y", -0.05)
+        .attr("width", 1.1)
+        .attr("height", 1.1);
+
+      circleTextFilter2.append("feFlood")
+        .attr("flood-color", "#ffd591")
+        .attr("flood-opacity", "1");
+
+      circleTextFilter2.append("feComposite")
+        .attr("in", "SourceGraphic")
+        .attr("operator", "over");
+
+      let circleTextFilter3 = defs
+        .append("filter")
+        .attr("id", "nodeTextBg3")
+        .attr("x", -0.05)
+        .attr("y", -0.05)
+        .attr("width", 1.1)
+        .attr("height", 1.1);
+
+      circleTextFilter3.append("feFlood")
+        .attr("flood-color", "#fffb8f")
+        .attr("flood-opacity", "1");
+
+      circleTextFilter3.append("feComposite")
         .attr("in", "SourceGraphic")
         .attr("operator", "over");
 
@@ -271,7 +303,7 @@ export default {
           return String(this.getBoundingClientRect().width / fontSize / 2 * -1) + "em";
         })
         .attr("dy", "2em")
-        .attr("filter", "url(#nodeTextBg)")
+        .attr("filter", "url(#nodeTextBg1)")
         .attr("class", "nodeText");
 
       let node = g.append("g")
@@ -735,7 +767,10 @@ export default {
         document.getElementById("kg-search-line").style.right = "0px";
       } else {
         document.getElementById("kg-search-line").style.right = "-400px";
-        d3.select("#nodeText-" + this.filteredNodes[this.currentIndex - 1]).attr("fill", "#000");
+        for (let i = 0; i < this.filteredNodes.length; i++) {
+          d3.select("#nodeText-" + this.filteredNodes[i]).attr("filter", "url(#nodeTextBg1)");
+        }
+        this.filteredNodes = [];
         this.$refs.KgSearchLine.setContent("");
         this.currentKeyword = "";
         this.totalNum = 0;
@@ -829,7 +864,10 @@ export default {
     handleSearchAcknowledge(content) {
       const _this = this;
       if (content !== _this.currentKeyword) {
-        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        // d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        for (let i = 0; i < this.filteredNodes.length; i++) {
+          d3.select("#nodeText-" + this.filteredNodes[i]).attr("filter", "url(#nodeTextBg1)");
+        }
         _this.currentKeyword = content;
         _this.totalNum = 0;
         _this.filteredNodes = [];
@@ -837,6 +875,7 @@ export default {
         for (let i = 0; i < nodes._groups[0].length; i++) {
           let node = nodes._groups[0][i].__data__;
           if (node.name_cn.indexOf(content) !== -1) {
+            d3.select("#nodeText-" + node.id).attr("filter", "url(#nodeTextBg2)");
             _this.filteredNodes.push(node.id);
             _this.totalNum += 1;
           }
@@ -855,7 +894,7 @@ export default {
     handlePrevIndex() {
       const _this = this;
       if (_this.filteredNodes.length !== 0) {
-        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("filter", "url(#nodeTextBg2)");
         _this.currentIndex = (_this.currentIndex - _this.filteredNodes.length - 1) % _this.filteredNodes.length + _this.filteredNodes.length;
         _this.setFilteredNodeLocationByIndex();
       }
@@ -864,7 +903,7 @@ export default {
     handleNextIndex() {
       const _this = this;
       if (_this.filteredNodes.length !== 0) {
-        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#000");
+        d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("filter", "url(#nodeTextBg2)");
         _this.currentIndex = _this.currentIndex % _this.filteredNodes.length + 1;
         _this.setFilteredNodeLocationByIndex();
       }
@@ -872,7 +911,7 @@ export default {
 
     setFilteredNodeLocationByIndex() {
       const _this = this;
-      d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("fill", "#fb7299");
+      d3.select("#nodeText-" + _this.filteredNodes[_this.currentIndex - 1]).attr("filter", "url(#nodeTextBg3)");
       let node = d3.select("#node-" + _this.filteredNodes[_this.currentIndex - 1]);
       let k = _this.lastZoomEvent.transform.k;
       let x = node._groups[0][0].__data__.x;
@@ -937,7 +976,7 @@ export default {
   top: 30vh;
   backdrop-filter: saturate(200%) blur(30px);
   background: rgba(240, 240, 240, 0.7);
-  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  box-shadow: 0 3px 5px rgba(220, 220, 220, 0.7);
   padding: 10px 0 3px 0;
   border-radius: 5px;
 }
@@ -950,7 +989,7 @@ export default {
   height: 70px;
   backdrop-filter: saturate(200%) blur(30px);
   background: rgba(240, 240, 240, 0.7);
-  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  box-shadow: 0 3px 5px rgba(220, 220, 220, 0.7);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -964,8 +1003,9 @@ export default {
   bottom: 0;
   right: 0;
   backdrop-filter: saturate(200%) blur(30px);
-  background: rgba(240, 240, 240, 0.7);
-  box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);
+  /*background: rgba(240, 240, 240, 0.7);*/
+  background: rgba(255, 255, 255, 0.7);
+  /*box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);*/
   border-radius: 10px 0 0 0;
 }
 </style>
