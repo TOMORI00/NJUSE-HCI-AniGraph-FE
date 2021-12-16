@@ -46,12 +46,13 @@ export default {
   },
   data() {
     return {
-      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg", //todo 上服务器
+      tempImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg",
+      noImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/noImage.png",
     };
   },
   methods: {
     getImageSrc(image) {
-      return image !== null ? image.replace("http", "https") : this.nullImageSrc;
+      return image !== null ? image.replace("http", "https") : this.noImageSrc;
     },
   },
 };

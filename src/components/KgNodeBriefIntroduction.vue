@@ -18,7 +18,8 @@ export default {
   name: "KgNodeBriefIntroduction",
   data() {
     return {
-      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg", //todo 上服务器
+      tempImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg",
+      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/noImage.png",
     };
   },
   props: {

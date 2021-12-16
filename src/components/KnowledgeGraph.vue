@@ -46,11 +46,11 @@ export default {
       drawerDisplay: false,
       drawerWidth: "500px",
       drawerData: {
-        image: null,
-        name_cn: null,
-        name: null,
-        alias: null,
-        summary: null,
+        image: "",
+        name_cn: "",
+        name: "",
+        alias: "",
+        summary: "",
       },
 
       nodes: null,
@@ -304,6 +304,7 @@ export default {
         })
         .attr("dy", "2em")
         .attr("filter", "url(#nodeTextBg1)")
+        .style("user-select", "none")
         .attr("class", "nodeText");
 
       let node = g.append("g")
@@ -662,8 +663,8 @@ export default {
         if (nodeIds.indexOf(newNode.id) !== -1) {
           continue;
         }
-        newNode.x = 0;
-        newNode.y = 0;
+        newNode.x = d.x;
+        newNode.y = d.y;
         newNodes.push(newNode);
       }
       this.nodes = newNodes;
@@ -931,11 +932,11 @@ export default {
     drawerDisplay(newVal, oldVal) {
       if (!newVal && oldVal) {
         this.drawerData = {
-          image: null,
-          name_cn: null,
-          name: null,
-          alias: null,
-          summary: null,
+          image: "",
+          name_cn: "",
+          name: "",
+          alias: "",
+          summary: "",
         };
       }
     },
@@ -1003,8 +1004,8 @@ export default {
   bottom: 0;
   right: 0;
   backdrop-filter: saturate(200%) blur(30px);
-  /*background: rgba(240, 240, 240, 0.7);*/
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(240, 240, 240, 0.7);
+  /*background: rgba(255, 255, 255, 0.7);*/
   /*box-shadow: 0 10px 10px rgba(220, 220, 220, 0.7);*/
   border-radius: 10px 0 0 0;
 }
