@@ -20,6 +20,7 @@
 
 <script>
 /* eslint-disable no-unused-vars */
+import Vue from "vue";
 import * as d3 from "d3";
 import {getRelationsByEntityIdAPI} from "../api/relations";
 import KgLinkBriefIntroduction from "./KgLinkBriefIntroduction";
@@ -29,6 +30,9 @@ import KgDrawerContent from "@/components/KgDrawerContent";
 import KgScaleDisplay from "./KgScaleDisplay";
 import KgSearchLine from "@/components/KgSearchLine";
 import KgLegend from "./KgLegend";
+import {message} from "ant-design-vue";
+
+Vue.prototype.$message = message;
 
 export default {
   name: "KnowledgeGraph",
@@ -78,6 +82,17 @@ export default {
       totalNum: 0,
       currentIndex: 0,
       filteredNodes: [],
+      //
+      clickTimer: null,
+      //
+      legend: {
+        subject: true,
+        character: true,
+        actor: true,
+        staff: true,
+        series: true,
+        link: true,
+      },
     };
   },
   computed: {},
@@ -268,6 +283,21 @@ export default {
         })
         .attr("stroke-opacity", linkStrokeOpacity)
         .attr("stroke-linecap", linkStrokeLinecap)
+        .attr("display", function (d) {
+          if (d.type === "series" && !_this.legend.series) {
+            return "none";
+          } else if (!_this.legend.link) {
+            return "none";
+          } else {
+            let sourceDisplay = getNodeDisplay(d.source);
+            let targetDisplay = getNodeDisplay(d.target);
+            if(sourceDisplay === "unset" && targetDisplay === "unset"){
+              return "unset";
+            }else{
+              return "none";
+            }
+          }
+        })
         .on("mouseover", function (event, d) {
           window.clearTimeout(_this.linkTimer);
           _this.linkTimer = window.setTimeout(async function () {
@@ -304,6 +334,7 @@ export default {
         })
         .attr("dy", "2em")
         .attr("filter", "url(#nodeTextBg1)")
+        .attr("display", getNodeDisplay)
         .style("user-select", "none")
         .attr("class", "nodeText");
 
@@ -317,11 +348,15 @@ export default {
         .attr("stroke-opacity", nodeStrokeOpacity)
         .attr("z-index", -100)
         .attr("fill", nodeFill)
+        .attr("display", getNodeDisplay)
         .attr("class", "node")
         .attr("id", function (d) {
           return "node-" + d.id;
         })
-        .on("dblclick", _this.handleNodeDblclick)
+        .on("dblclick", function (event, d) {
+          window.clearTimeout(_this.clickTimer);
+          _this.handleNodeDblclick(event, d);
+        })
         .on("mouseover", function (event, d) {
           if (d === _this.currentNode) {
             window.clearTimeout(_this.nodeTimer);
@@ -346,12 +381,22 @@ export default {
           }, 100);
         })
         .on("contextmenu", function (event, d) {
-          _this.drawerDisplay = true;
-          _this.drawerData = d;
+          setTimeout(function () {
+            _this.drawerDisplay = true;
+            _this.drawerData = d;
+          }, 200);
         })
         .on("click", function (event, d) {
-          _this.drawerDisplay = true;
-          _this.drawerData = d;
+          if (_this.clickTimer === null || _this.drawerData.id !== d.id) {
+            _this.drawerData = d;
+            _this.clickTimer = setTimeout(function () {
+              _this.drawerDisplay = true;
+              _this.clickTimer = null;
+            }, 200);
+          } else {
+            window.clearTimeout(_this.clickTimer);
+            _this.clickTimer = null;
+          }
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -555,6 +600,20 @@ export default {
           }
         }
       }
+
+      function getNodeDisplay(d) {
+        let type = String(d.id)[0];
+        switch (type) {
+          case "1":
+            return _this.legend.subject ? "unset" : "none";
+          case "2":
+            return _this.legend.character ? "unset" : "none";
+          case "3":
+            return _this.legend.actor ? "unset" : "none";
+          case "4":
+            return _this.legend.staff ? "unset" : "none";
+        }
+      }
     },
 
     setLinkStrokeDashArray(d) {
@@ -593,11 +652,11 @@ export default {
     },
 
     setLinkStrength(d) {
-      return 0.15;
+      return 0.25;
     },
 
     setLinkDistance(d) {
-      return d.type !== "series" ? this.nodeRadius * 6 : this.nodeRadius * 12;
+      return d.type !== "series" ? this.nodeRadius * 8 : this.nodeRadius * 16;
     },
 
     setLinkFill(d) {
@@ -680,6 +739,7 @@ export default {
       this.currentNode = null;
       this.g.remove();
       this.initPage();
+      this.$message.success("图谱扩展成功");
     },
 
     setLinkBriefIntroductionVisible(event, d) {
@@ -782,6 +842,13 @@ export default {
     },
 
     handleLegendChange({subject, character, actor, staff, series, link}) {
+      this.legend.subject = subject;
+      this.legend.character = character;
+      this.legend.actor = actor;
+      this.legend.staff = staff;
+      this.legend.series = series;
+      this.legend.link - link;
+
       d3.selectAll(".node").attr("display", function (d) {
         let type = String(d.id)[0];
         switch (type) {
@@ -877,7 +944,7 @@ export default {
         let nodes = d3.selectAll(".nodeText");
         for (let i = 0; i < nodes._groups[0].length; i++) {
           let node = nodes._groups[0][i].__data__;
-          if (node.name_cn.indexOf(content) !== -1) {
+          if (node.name_cn.indexOf(content) !== -1 && d3.select("#node-"+node.id).attr("display") !== "none") {
             d3.select("#nodeText-" + node.id).attr("filter", "url(#nodeTextBg2)");
             _this.filteredNodes.push(node.id);
             _this.totalNum += 1;
@@ -885,9 +952,11 @@ export default {
         }
         if (_this.filteredNodes.length === 0) {
           _this.currentIndex = 0;
+          _this.$message.error("无搜索结果");
         } else {
           _this.currentIndex = 1;
           _this.setFilteredNodeLocationByIndex();
+          _this.$message.success("搜索成功！");
         }
       } else {
         _this.handleNextIndex();
