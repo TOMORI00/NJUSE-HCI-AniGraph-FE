@@ -350,6 +350,8 @@ export default {
           _this.drawerData = d;
         })
         .on("click", function (event, d) {
+          _this.drawerDisplay = true;
+          _this.drawerData = d;
         })
         .call(drag(simulation));
       // // 如果设置了nodeTitle的函数，那么将为每个节点添加相关的title
@@ -595,7 +597,7 @@ export default {
     },
 
     setLinkDistance(d) {
-      return d.type !== "series" ? this.nodeRadius * 8 : this.nodeRadius * 20;
+      return d.type !== "series" ? this.nodeRadius * 6 : this.nodeRadius * 12;
     },
 
     setLinkFill(d) {
