@@ -165,7 +165,7 @@ export default {
 
       const forceNode = d3.forceManyBody();
       if (nodeStrength !== undefined) {
-        forceNode.strength(nodeStrength);
+        forceNode.strength(nodeStrength).distanceMax(600);
       }
       const forceCollision = d3.forceCollide();
       if (nodeCollision !== undefined) {
@@ -181,6 +181,9 @@ export default {
       let wCenter = width / 2;
       let hCenter = height / 2;
       const simulation = d3.forceSimulation(nodes)
+        // .alphaDecay(0.03)
+        // .alphaMin(0.005)
+        // .velocityDecay(0.2)
         .force("link", forceLink)
         .force("charge", forceNode)
         .force("collision", forceCollision)
@@ -291,9 +294,9 @@ export default {
           } else {
             let sourceDisplay = getNodeDisplay(d.source);
             let targetDisplay = getNodeDisplay(d.target);
-            if(sourceDisplay === "unset" && targetDisplay === "unset"){
+            if (sourceDisplay === "unset" && targetDisplay === "unset") {
               return "unset";
-            }else{
+            } else {
               return "none";
             }
           }
@@ -392,7 +395,7 @@ export default {
             _this.clickTimer = setTimeout(function () {
               _this.drawerDisplay = true;
               _this.clickTimer = null;
-            }, 200);
+            }, 400);
           } else {
             window.clearTimeout(_this.clickTimer);
             _this.clickTimer = null;
@@ -652,11 +655,11 @@ export default {
     },
 
     setLinkStrength(d) {
-      return 0.25;
+      return 0.2;
     },
 
     setLinkDistance(d) {
-      return d.type !== "series" ? this.nodeRadius * 8 : this.nodeRadius * 16;
+      return d.type !== "series" ? this.nodeRadius * 6 : this.nodeRadius * 12;
     },
 
     setLinkFill(d) {
@@ -724,7 +727,7 @@ export default {
         if (nodeIds.indexOf(newNode.id) !== -1) {
           continue;
         }
-        newNode.x = d.x;
+        newNode.x = d.x + 200;
         newNode.y = d.y;
         newNodes.push(newNode);
       }
@@ -944,7 +947,7 @@ export default {
         let nodes = d3.selectAll(".nodeText");
         for (let i = 0; i < nodes._groups[0].length; i++) {
           let node = nodes._groups[0][i].__data__;
-          if (node.name_cn.indexOf(content) !== -1 && d3.select("#node-"+node.id).attr("display") !== "none") {
+          if (node.name_cn.indexOf(content) !== -1 && d3.select("#node-" + node.id).attr("display") !== "none") {
             d3.select("#nodeText-" + node.id).attr("filter", "url(#nodeTextBg2)");
             _this.filteredNodes.push(node.id);
             _this.totalNum += 1;
@@ -1070,7 +1073,7 @@ export default {
 }
 
 #kg-legend {
-  padding: 10px 20px 10px 10px;
+  padding: 10px 15px 10px 10px;
   position: fixed;
   bottom: 0;
   right: 0;

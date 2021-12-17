@@ -4,7 +4,7 @@
     <div style="min-width: 10px"/>
     <GlobalHeaderSearchLine v-show="currentPage !== 'SearchPage'"></GlobalHeaderSearchLine>
     <div style="min-width: 10px"/>
-    <GlobalHeaderNavigator :current-page="this.currentPage"></GlobalHeaderNavigator>
+    <GlobalHeaderNavigator :current-page="this.currentPage" @show-modal="$emit('show-modal')"/>
   </div>
 </template>
 

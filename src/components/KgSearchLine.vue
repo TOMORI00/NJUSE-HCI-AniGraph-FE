@@ -32,13 +32,13 @@
            viewBox="0 0 1024 1024" width="32" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M761.6 489.6l-432-435.2c-9.6-9.6-25.6-9.6-35.2 0-9.6 9.6-9.6 25.6 0 35.2l416 416-416 425.6c-9.6 9.6-9.6 25.6 0 35.2s25.6 9.6 35.2 0l432-441.6C771.2 515.2 771.2 499.2 761.6 489.6z"
-          fill="#333333"></path>
+          fill="#666"></path>
       </svg>
       <!--      <div style="display: inline-block; position: relative; bottom: 8px; left: 2px; font-weight: bold">-->
       <!--        {{ switchTip }}-->
       <!--      </div>-->
     </div>
-    <div id="kg-search-line-tip">搜索节点</div>
+    <div id="kg-search-line-tip">搜索</div>
     <div
       style="width: 60%; outline: solid 1px gray; height: 0;margin-top: 1px;margin-bottom: 6px; margin-left: 20%; display: inline-block"></div>
     <div id="kg-search-line-main">

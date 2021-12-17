@@ -53,7 +53,7 @@ export default {
       loadingCandidateContent: false,
       noneCandidateContent: false,
 
-      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg", //todo 上服务器
+      nullImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/no-image.png", //todo 上服务器
     };
   },
   computed: {},

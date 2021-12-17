@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       tempImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/null.svg",
-      noImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/noImage.png",
+      noImageSrc: "https://mjh1.oss-cn-hangzhou.aliyuncs.com/hci/no-image.png",
     };
   },
   methods: {
