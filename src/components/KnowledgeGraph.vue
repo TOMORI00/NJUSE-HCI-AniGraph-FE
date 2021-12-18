@@ -165,7 +165,7 @@ export default {
 
       const forceNode = d3.forceManyBody();
       if (nodeStrength !== undefined) {
-        forceNode.strength(nodeStrength).distanceMax(600);
+        forceNode.strength(nodeStrength).distanceMax(750);
       }
       const forceCollision = d3.forceCollide();
       if (nodeCollision !== undefined) {
@@ -655,11 +655,11 @@ export default {
     },
 
     setLinkStrength(d) {
-      return 0.2;
+      return 0.15;
     },
 
     setLinkDistance(d) {
-      return d.type !== "series" ? this.nodeRadius * 6 : this.nodeRadius * 12;
+      return d.type !== "series" ? this.nodeRadius * 8 : this.nodeRadius * 16;
     },
 
     setLinkFill(d) {
@@ -727,7 +727,7 @@ export default {
         if (nodeIds.indexOf(newNode.id) !== -1) {
           continue;
         }
-        newNode.x = d.x + 200;
+        newNode.x = (d.x > this.w / 2) ? (d.x + 200) : (d.x - 200);
         newNode.y = d.y;
         newNodes.push(newNode);
       }
