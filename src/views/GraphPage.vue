@@ -5,7 +5,7 @@
 
     <a-modal id="kg-tips" v-model="visible" title="图谱教程" @ok="handleOk"
              :footer="null"
-             :width="880">
+             :width="1025">
       <a-carousel :after-change="onChange" arrows>
         <div
           slot="prevArrow"
@@ -91,9 +91,9 @@ export default {
 
 .ant-carousel >>> .slick-slide {
   text-align: center;
-  height: 450px;
+  height: 531px;
   line-height: 160px;
-  background: ghostwhite;
+  /*background: ghostwhite;*/
   overflow: hidden;
 }
 
@@ -119,22 +119,22 @@ export default {
 }
 
 .kg-tip-img{
-  width: 800px;
-  height: 450px;
-  object-position: 50% 50%;
+  width: 945px;
+  height: 531px;
+  /*object-position: 50% 50%;*/
 }
 
 /deep/ .ant-modal-body{
   padding-left: 40px;
   padding-right: 40px;
-  background: ghostwhite;
+  /*background: ghostwhite;*/
 }
 
 /deep/ .ant-modal-header{
-  background: ghostwhite;
+  /*background: ghostwhite;*/
 }
 
 /deep/ .ant-modal{
-  top: 15vh;
+  top: 12vh;
 }
 </style>
