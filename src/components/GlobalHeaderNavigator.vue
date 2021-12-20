@@ -1,5 +1,13 @@
 <template>
   <div class="nav">
+    <div v-if="currentPage==='GraphPage'" style="cursor:pointer;padding:2px;height: 25px;width: 25px;margin-right: 25px" @click="$router.back()">
+      <svg t="1639915169697" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+           p-id="6975" width="21" height="21" fill="#fb7299">
+        <path
+          d="M261.31 467.211l99.327-108.188-55.43-60.327L138.92 479.722l-27.648 30.141 193.981 211.39 55.34-60.55-99.283-108.188H677.5V467.21h-416.19zM442.423 1024h391.791a75.42 75.42 0 0 0 55.608-25.021 89.533 89.533 0 0 0 22.84-60.55V85.526A82.276 82.276 0 0 0 834.036 0H442.246v85.304H794.68a37.576 37.576 0 0 1 27.781 12.243 44.522 44.522 0 0 1 11.665 30.052v768.757a41.227 41.227 0 0 1-39.446 42.34H442.424V1024z m0 0"
+          p-id="6976" fill="#fb7299"></path>
+      </svg>
+    </div>
     <!--    <div @click="toHomePage" class="nav-button">Avatar</div>-->
     <!--    <div @click="toSearchPage" v-show="currentPage !== 'SearchPage'" class="nav-button">搜索</div>-->
     <!--    <div @click="toHomePage" class="nav-button">个人中心</div>-->
@@ -7,6 +15,7 @@
     <!--    <div></div>-->
     <!--    <div @click="toArchive" class="nav-button">每日放送</div>-->
     <div v-if="currentPage==='GraphPage'" style="cursor:pointer;height: 25px;width: 25px" @click="$emit('show-modal')">
+
       <svg t="1639623240339" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
            p-id="2025" width="25" height="25">
         <path
@@ -46,7 +55,7 @@ export default {
   width: 195px;
   display: flex;
   justify-content: space-around;
-  padding-left: 145px;
+  padding-left: 95px;
   padding-right: 25px;
   font-weight: bolder;
   font-size: larger;
